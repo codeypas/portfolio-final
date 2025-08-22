@@ -6,7 +6,7 @@ import { blogAPI, contactAPI, studyAPI, projectAPI } from "../services/api"
 import * as LucideIcons from "lucide-react" // Import all Lucide icons
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-final-7jgp.onrender.com"
 
 // Helper component for dynamic Lucide icons or image URLs
 const DynamicLucideIcon = ({ name, ...props }) => {
