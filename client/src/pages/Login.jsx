@@ -1,3 +1,5 @@
+const API_BASE_URL = import.meta.env.VITE_API_URL;
+
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Eye, EyeOff, User, Mail, Lock, AlertCircle, CheckCircle } from "lucide-react"
@@ -23,22 +25,41 @@ export default function Login() {
     checkServerStatus()
   }, [])
 
+  // const checkServerStatus = async () => {
+  //   try {
+  //     const response = await fetch("http://localhost:3000/api/health", {
+  //       // Changed port to 3000
+  //       method: "GET",
+  //       mode: "cors",
+  //     })
+  //     if (response.ok) {
+  //       setServerStatus("online")
+  //     } else {
+  //       setServerStatus("offline")
+  //     }
+  //   } catch (error) {
+  //     setServerStatus("offline")
+  //   }
+  // }
+
+
+
   const checkServerStatus = async () => {
-    try {
-      const response = await fetch("http://localhost:3000/api/health", {
-        // Changed port to 3000
-        method: "GET",
-        mode: "cors",
-      })
-      if (response.ok) {
-        setServerStatus("online")
-      } else {
-        setServerStatus("offline")
-      }
-    } catch (error) {
-      setServerStatus("offline")
+  try {
+    const response = await fetch(`${API_BASE_URL}/health`, {
+      method: "GET",
+      mode: "cors",
+    });
+    if (response.ok) {
+      setServerStatus("online");
+    } else {
+      setServerStatus("offline");
     }
+  } catch (error) {
+    setServerStatus("offline");
   }
+};
+
 
   const handleInputChange = (e) => {
     setFormData({
