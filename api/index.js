@@ -72,8 +72,6 @@
 // })
 
 
-
-
 import express from "express"
 import mongoose from "mongoose"
 import dotenv from "dotenv"
@@ -105,7 +103,9 @@ const __dirname = path.dirname(__filename)
 
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.FRONTEND_URL || "https://bijayadhikari28.com.np/",
+  "https://bijayadhikari28.com.np", // Added your actual Hostinger domain
+  "https://www.bijayadhikari28.com.np", // Added www version for safety
+  process.env.FRONTEND_URL || "https://your-domain.com",
 ]
 
 app.use(
