@@ -5,9 +5,9 @@ import { useAuth } from "../context/AuthContext"
 import { projectAPI } from "../services/api"
 
 // Define the base URL for uploaded files
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
 export default function Project() {
   const [selectedCategory, setSelectedCategory] = useState("All")

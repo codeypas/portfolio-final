@@ -7,6 +7,8 @@ import { studyAPI } from "../services/api"
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
+
+
 export default function StudyHub() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [searchTerm, setSearchTerm] = useState("")
