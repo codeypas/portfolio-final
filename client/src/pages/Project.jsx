@@ -9,6 +9,9 @@ const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhos
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
+const response = await projectAPI.getProjects()
+
+
 export default function Project() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const { isAdmin } = useAuth()
@@ -185,24 +188,47 @@ export default function Project() {
 
   const categories = ["All", "Mobile", "Blockchain", "Full Stack", "Frontend", "Backend", "Web App", "Browser Extension", "Open Source"]
 
+  // useEffect(() => {
+  //   const fetchProjects = async () => {
+  //     try {
+  //       setLoading(true)
+  //       const response = await projectAPI.getProjects()
+  //       // Sort projects by createdAt date in descending order (newest first)
+  //       const sortedProjects = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+  //       setProjects(sortedProjects)
+  //     } catch (err) {
+  //       console.error("Failed to fetch projects:", err)
+  //       setError("Failed to load projects. Please try again later.")
+  //       setProjects([])
+  //     } finally {
+  //       setLoading(false)
+  //     }
+  //   }
+  //   fetchProjects()
+  // }, [])
+
+
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        setLoading(true)
-        const response = await projectAPI.getProjects()
-        // Sort projects by createdAt date in descending order (newest first)
-        const sortedProjects = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        setProjects(sortedProjects)
-      } catch (err) {
-        console.error("Failed to fetch projects:", err)
-        setError("Failed to load projects. Please try again later.")
-        setProjects([])
-      } finally {
-        setLoading(false)
-      }
+  const fetchProjects = async () => {
+    try {
+      setLoading(true)
+      const response = await projectAPI.getProjects()
+      const sortedProjects = response.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
+      setProjects(sortedProjects)
+    } catch (err) {
+      console.error("Failed to fetch projects:", err)
+      // Instead of blocking UI, just fallback
+      setProjects([])
+    } finally {
+      setLoading(false)
     }
-    fetchProjects()
-  }, [])
+  }
+  fetchProjects()
+}, [])
+
 
   const projectsToDisplay = projects.length > 0 ? projects : sampleProjects
 
