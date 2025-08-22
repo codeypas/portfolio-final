@@ -37,8 +37,6 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-// Serve static files from the 'uploads' directory and its subdirectories
-// Ensure these directories exist in your 'api' folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use("/uploads/blogs", express.static(path.join(__dirname, "uploads/blogs")))
 app.use("/uploads/study-icons", express.static(path.join(__dirname, "uploads/study-icons")))
@@ -61,7 +59,7 @@ app.use("/api/auth", authRoutes)
 app.use("/api/blogs", blogRoutes)
 app.use("/api/study", studyRoutes)
 app.use("/api/projects", projectRoutes)
-app.use("/api/contact", contactRoutes) // Use new contact routes
+app.use("/api/contact", contactRoutes) 
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500
