@@ -17,7 +17,7 @@ const DynamicLucideIcon = ({ name, ...props }) => {
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;  s
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")

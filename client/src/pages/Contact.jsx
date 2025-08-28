@@ -51,7 +51,7 @@ export default function Contact() {
     setIsSubmitting(true)
 
     try {
-      // Simulate API call - replace with actual email service
+      // Simulate API call - replace with actual email service. 
       await new Promise((resolve) => setTimeout(resolve, 2000))
 
       setSubmitStatus({
