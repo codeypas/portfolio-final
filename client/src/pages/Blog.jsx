@@ -98,12 +98,14 @@ export default function Blog() {
     const fetchBlogs = async () => {
       try {
         setLoading(true)
+        setError(null) // Clear previous errors
         const response = await blogAPI.getBlogs()
-        setBlogPosts(response.data)
+        setBlogPosts(response.data || [])
       } catch (err) {
         console.error("Failed to fetch blogs:", err)
-        setError("Failed to load blogs. Please try again later.")
-        setBlogPosts([]) // Clear posts on error
+        setBlogPosts([]) // Use sample data as fallback
+        // Only show error in console, not blocking UI
+        console.warn("Using sample blog data due to API failure")
       } finally {
         setLoading(false)
       }
@@ -111,7 +113,6 @@ export default function Blog() {
     fetchBlogs()
   }, [])
 
-  // Determine which posts to display: fetched posts if available, otherwise sample posts
   const postsToDisplay = blogPosts.length > 0 ? blogPosts : sampleBlogPosts
 
   const filteredPosts =
@@ -125,16 +126,21 @@ export default function Blog() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="pt-16 min-h-screen">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mx-4 mt-4 rounded">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Unable to load latest blogs from server. Showing sample content.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto text-center">
