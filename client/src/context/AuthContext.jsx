@@ -1,5 +1,3 @@
-"use client"
-
 import { createContext, useContext, useState, useEffect } from "react"
 import { authAPI } from "../services/api"
 
@@ -24,12 +22,11 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      // No need to check localStorage for token, it's httpOnly cookie
-      const response = await authAPI.getProfile() // This call will send the httpOnly cookie
+      const response = await authAPI.getProfile()
       setUser(response.data.user)
     } catch (error) {
       console.log("Auth check failed (likely no valid cookie):", error.message)
-      setUser(null) // Ensure user is null if auth fails
+      setUser(null)
     } finally {
       setLoading(false)
     }
@@ -38,28 +35,50 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setError(null)
+      setLoading(true) // Add loading state during login
       const response = await authAPI.login(credentials)
-      // Token is set as httpOnly cookie by backend, so we only get user data here
-      setUser(response.data.user) // Now expects { user: ... }
+      setUser(response.data.user)
       return { success: true }
     } catch (error) {
-      const message = error.response?.data?.message || "Login failed. Please check if the server is running."
+      let message = "Login failed. Please try again."
+
+      if (error.code === "NETWORK_ERROR" || error.message.includes("Network Error")) {
+        message = "Cannot connect to server. Please check if the backend is running."
+      } else if (error.response?.status === 401) {
+        message = "Invalid email or password."
+      } else if (error.response?.data?.message) {
+        message = error.response.data.message
+      }
+
       setError(message)
       return { success: false, error: message }
+    } finally {
+      setLoading(false) // Clear loading state
     }
   }
 
   const register = async (userData) => {
     try {
       setError(null)
+      setLoading(true) // Add loading state during registration
       const response = await authAPI.register(userData)
-      // Token is set as httpOnly cookie by backend, so we only get user data here
-      setUser(response.data.user) // Now expects { user: ... }
+      setUser(response.data.user)
       return { success: true }
     } catch (error) {
-      const message = error.response?.data?.message || "Registration failed. Please check if the server is running."
+      let message = "Registration failed. Please try again."
+
+      if (error.code === "NETWORK_ERROR" || error.message.includes("Network Error")) {
+        message = "Cannot connect to server. Please check if the backend is running."
+      } else if (error.response?.status === 409) {
+        message = "Email already exists. Please use a different email."
+      } else if (error.response?.data?.message) {
+        message = error.response.data.message
+      }
+
       setError(message)
       return { success: false, error: message }
+    } finally {
+      setLoading(false) // Clear loading state
     }
   }
 

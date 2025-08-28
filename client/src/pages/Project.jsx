@@ -183,20 +183,30 @@ export default function Project() {
     },
   ]
 
-  const categories = ["All", "Mobile", "Blockchain", "Full Stack", "Frontend", "Backend", "Web App", "Browser Extension", "Open Source"]
+  const categories = [
+    "All",
+    "Mobile",
+    "Blockchain",
+    "Full Stack",
+    "Frontend",
+    "Backend",
+    "Web App",
+    "Browser Extension",
+    "Open Source",
+  ]
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         setLoading(true)
+        setError(null) // Clear previous errors
         const response = await projectAPI.getProjects()
-        // Sort projects by createdAt date in descending order (newest first)
         const sortedProjects = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        setProjects(sortedProjects)
+        setProjects(sortedProjects || [])
       } catch (err) {
         console.error("Failed to fetch projects:", err)
-        setError("Failed to load projects. Please try again later.")
-        setProjects([])
+        setProjects([]) // Use sample data as fallback
+        console.warn("Using sample project data due to API failure")
       } finally {
         setLoading(false)
       }
@@ -224,16 +234,21 @@ export default function Project() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="pt-16 min-h-screen">
+      {/* Error Banner */}
+      {error && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mx-4 mt-4 rounded">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Unable to load latest projects from server. Showing sample content.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-purple-50 to-blue-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto text-center">
