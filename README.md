@@ -32,11 +32,6 @@ I will share here my **blogs, projects, and notes** to help students in need —
 
 ---
 
-## 📸 Screenshots (Preview)
-> Add screenshots or GIFs of your Home, Blog, Study Hub, and Projects pages here.
-
----
-
 ## 🚀 Installation & Setup
 
 1. Clone the repository:
