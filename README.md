@@ -3,8 +3,12 @@
 This is my **personal portfolio website** built to showcase my skills, projects, blogs, and study materials.  
 The site is designed with **simplicity, uniqueness, and interactivity** in mind using modern web technologies.  
 
+I will share here my **blogs, projects, and notes** to help students in need — including **placement prep, DSA, and development resources**. 
 
-🔗 **Live Website:** [Visit Portfolio](https://your-portfolio-link.com)
+****Let’s connect, learn, and grow together!** ** 
+
+🔗 **Live Website:** [Visit Portfolio](https://bijayadhikari28.com.np/)
+
 
 
 ---
