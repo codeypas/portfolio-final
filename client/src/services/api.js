@@ -1,7 +1,7 @@
 import axios from "axios"
 // import API_URL from "./config";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "https://portfolio-final-2u9l.onrender.com/api"
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -288,7 +288,7 @@ export default function Contact() {
                 <div className="flex items-center mb-4">
                   <MapPin className="text-blue-600 dark:text-blue-400 mr-3" size={24} />
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white">Chitvan, Nepal</h4>
+                    <h4 className="font-semibold text-gray-900 dark:text-white">BMS College of Engineering</h4>
                     <p className="text-gray-600 dark:text-gray-300">Remote-friendly | Open to relocation</p>
                   </div>
                 </div>
@@ -296,14 +296,14 @@ export default function Contact() {
                 {/* Embedded Map */}
                 <div className="aspect-video rounded-lg overflow-hidden">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d113032.56149281568!2d84.35073842167969!3d27.529305899999997!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3994fb2b9b8b8b8b%3A0x1234567890abcdef!2sChitwan%2C%20Nepal!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.6678255959145!2d77.56453627495574!3d12.928704287391942!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae158b184236a9%3A0x280e8e977f832d20!2sBMS%20College%20of%20Engineering!5e0!3m2!1sen!2sin!4v1699999999999!5m2!1sen!2sin"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen=""
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Chitvan, Nepal Location"
+                    title="BMSCE Location"
                   ></iframe>
                 </div>
               </div>

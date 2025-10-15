@@ -27,7 +27,7 @@ export default function Login() {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/health", {
+      const response = await fetch("https://portfolio-final-2u9l.onrender.com/api/health", {
         // Changed port to 3000
         method: "GET",
         mode: "cors",
