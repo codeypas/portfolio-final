@@ -3,6 +3,16 @@ import User from "../models/user.model.js"
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 
+const setCookie = (res, token) => {
+  const isProduction = process.env.NODE_ENV === "production"
+  res.cookie("access_token", token, {
+    httpOnly: true,
+    secure: isProduction, // HTTPS only in production
+    sameSite: isProduction ? "None" : "Lax", // None for cross-origin in production
+    maxAge: 3600000, // 1 hour
+  })
+}
+
 export const signup = async (req, res, next) => {
   const { username, email, password } = req.body
 
@@ -20,11 +30,10 @@ export const signup = async (req, res, next) => {
 
   try {
     await newUser.save()
-    // After successful signup, automatically sign them in and return user data
-    const { password: hashedPasswordFromDoc, ...rest } = newUser._doc // Destructure password from saved user
+    const { password: hashedPasswordFromDoc, ...rest } = newUser._doc
     const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET)
-    // Standardize response to { user: ... }
-    res.status(201).cookie("access_token", token, { httpOnly: true, maxAge: 3600000 }).json({ user: rest })
+    setCookie(res, token)
+    res.status(201).json({ user: rest })
   } catch (error) {
     next(error)
   }
@@ -48,12 +57,11 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, "Invalid password"))
     }
 
-    // IMPORTANT: Include user role in the JWT token payload
     const token = jwt.sign({ id: validUser._id, role: validUser.role }, process.env.JWT_SECRET)
 
     const { password: hashedPassword, ...rest } = validUser._doc
-    // Standardize response to { user: ... }
-    res.status(200).cookie("access_token", token, { httpOnly: true, maxAge: 3600000 }).json({ user: rest })
+    setCookie(res, token)
+    res.status(200).json({ user: rest })
   } catch (error) {
     console.error("Signin error:", error)
     next(error)
@@ -62,8 +70,7 @@ export const signin = async (req, res, next) => {
 
 export const getUserProfile = async (req, res, next) => {
   try {
-    // req.user is populated by verifyToken middleware
-    const user = await User.findById(req.user.id).select("-password") // Fetch user without password
+    const user = await User.findById(req.user.id).select("-password")
     if (!user) {
       return next(errorHandler(404, "User not found"))
     }
