@@ -1,207 +1,38 @@
 import { useState, useEffect } from "react"
-import { Download, Eye, Calendar, Heart, Search, FileText, Video, Code, BookOpen, Plus } from "lucide-react"
-import { Link } from "react-router-dom"
-import { useAuth } from "../context/AuthContext"
-import { studyAPI } from "../services/api"
+import { useParams, Link } from "react-router-dom"
+import { projectAPI } from "../services/api"
+import { Calendar, Eye, Star, Github, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
 
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-final-2u9l.onrender.com"
 
 
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
-export default function StudyHub() {
-  const [selectedCategory, setSelectedCategory] = useState("All")
-  const [searchTerm, setSearchTerm] = useState("")
-  const { isAdmin } = useAuth()
-  const [studyResources, setStudyResources] = useState([])
+export default function ProjectDetails() {
+  const { id } = useParams()
+  const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const sampleStudyResources = [
-    {
-      id: "sample1",
-      title: "React Complete Cheat Sheet",
-      category: "Web Development",
-      description: "Comprehensive React cheat sheet covering hooks, components, state management, and best practices.",
-      format: "PDF",
-      icon: "FileText", // Lucide icon name
-      uploadDate: "July 2025",
-      downloads: 1250,
-      likes: 89,
-      fileUrl: "/resources/react-cheat-sheet.pdf",
-    },
-    {
-      id: "sample2",
-      title: "OS Unit 5 Notes - Process Scheduling",
-      category: "Operating Systems",
-      description:
-        "Includes scheduling algorithms with diagrams and examples. FCFS, SJF, Round Robin, and Priority scheduling.",
-      format: "PDF",
-      icon: "FileText",
-      uploadDate: "July 2025",
-      downloads: 890,
-      likes: 67,
-      fileUrl: "/resources/os-unit5-notes.pdf",
-    },
-    {
-      id: "sample3",
-      title: "DSA Interview Questions",
-      category: "DSA",
-      description: "Top 100 data structures and algorithms questions asked in technical interviews with solutions.",
-      format: "PDF",
-      icon: "FileText",
-      uploadDate: "June 2025",
-      downloads: 2100,
-      likes: 156,
-      fileUrl: "/resources/dsa-interview-questions.pdf",
-    },
-    {
-      id: "sample4",
-      title: "Database Management System Notes",
-      category: "Database",
-      description:
-        "Complete DBMS notes covering normalization, SQL queries, transactions, and database design principles.",
-      format: "PDF",
-      icon: "FileText",
-      uploadDate: "June 2025",
-      downloads: 1650,
-      likes: 98,
-      fileUrl: "/resources/dbms-complete-notes.pdf",
-    },
-    {
-      id: "sample5",
-      title: "Cybersecurity Fundamentals",
-      category: "Cybersecurity",
-      description: "Introduction to cybersecurity concepts, threats, vulnerabilities, and protection mechanisms.",
-      format: "PPT",
-      icon: "Video",
-      uploadDate: "May 2025",
-      downloads: 750,
-      likes: 45,
-      fileUrl: "/resources/cybersecurity-fundamentals.pptx",
-    },
-    {
-      id: "sample6",
-      title: "JavaScript ES6+ Features",
-      category: "Web Development",
-      description:
-        "Modern JavaScript features including arrow functions, destructuring, promises, async/await, and modules.",
-      format: "PDF",
-      icon: "FileText",
-      uploadDate: "May 2025",
-      downloads: 1850,
-      likes: 134,
-      fileUrl: "/resources/javascript-es6-features.pdf",
-    },
-    {
-      id: "sample7",
-      title: "Placement Preparation Guide",
-      category: "Placement",
-      description:
-        "Complete guide for placement preparation including resume tips, interview strategies, and company-wise questions.",
-      format: "PDF",
-      icon: "FileText",
-      uploadDate: "April 2025",
-      downloads: 3200,
-      likes: 245,
-      fileUrl: "/resources/placement-preparation-guide.pdf",
-    },
-    {
-      id: "sample8",
-      title: "Node.js Backend Development",
-      category: "Web Development",
-      description: "Learn backend development with Node.js, Express, MongoDB, and RESTful API design patterns.",
-      format: "Code",
-      icon: "Code",
-      uploadDate: "April 2025",
-      downloads: 980,
-      likes: 72,
-      fileUrl: "/resources/nodejs-backend-code.zip",
-    },
-  ]
-
-  // Helper component to render Lucide icons or image URLs
-  const ResourceIcon = ({ iconNameOrUrl, ...props }) => {
-    const imageUrl =
-      iconNameOrUrl && iconNameOrUrl.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${iconNameOrUrl}` : iconNameOrUrl
-    if (
-      imageUrl &&
-      (imageUrl.startsWith("http://") || imageUrl.startsWith("https://") || imageUrl.startsWith("blob:"))
-    ) {
-      return <img src={imageUrl || "/placeholder.svg"} alt="Resource Icon" className="w-6 h-6 object-contain" />
-    }
-    const IconComponent = {
-      FileText: FileText,
-      Video: Video,
-      Code: Code,
-      BookOpen: BookOpen,
-      // Add more mappings for other Lucide icons you might use
-    }[iconNameOrUrl]
-    return IconComponent ? <IconComponent {...props} /> : <FileText {...props} /> // Default to FileText if not found
-  }
-
-  const categories = ["All", "DSA", "Web Development", "1st SEM", "2nd SEM", "3rd SEM", "4th SEM", "5th SEM", "6th SEM", "7th SEM", "8th SEM","Placement"];
-
   useEffect(() => {
-    const fetchStudyResources = async () => {
+    const fetchProject = async () => {
+      setLoading(true)
+      setError(null)
       try {
-        setLoading(true)
-        const response = await studyAPI.getResources()
-        setStudyResources(response.data)
+        const response = await projectAPI.getProject(id)
+        setProject(response.data)
+        // Increment visitor count only if successfully fetched from API
+        await projectAPI.incrementVisitor(id)
       } catch (err) {
-        console.error("Failed to fetch study resources:", err)
-        setError("Failed to load study resources. Please try again later.")
-        setStudyResources([])
+        console.error("Failed to fetch project details:", err)
+        setError("Failed to load project details. It might not exist or there was a server error.")
       } finally {
         setLoading(false)
       }
     }
-    fetchStudyResources()
-  }, [])
-
-  const resourcesToDisplay = studyResources.length > 0 ? studyResources : sampleStudyResources
-
-  const filteredResources = resourcesToDisplay.filter((resource) => {
-    const matchesCategory = selectedCategory === "All" || resource.category === selectedCategory
-    const matchesSearch =
-      resource.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchTerm.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
-
-  const handleDownload = async (resourceId, fileUrl) => {
-    try {
-      // Increment download count via API
-      await studyAPI.downloadResource(resourceId)
-      console.log(`Incremented download count for: ${resourceId}`)
-
-      // Construct full URL for download if it's a local upload
-      const fullFileUrl = fileUrl.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${fileUrl}` : fileUrl
-
-      // Initiate file download by opening in a new tab
-      window.open(fullFileUrl, "_blank")
-
-      // Refetch resources to update download count on UI
-      const response = await studyAPI.getResources()
-      setStudyResources(response.data)
-    } catch (error) {
-      console.error("Error during download or increment:", error)
-      alert("Failed to download resource or record download. Please try again.")
-    }
-  }
-
-  const handleLike = async (resourceId) => {
-    try {
-      await studyAPI.likeResource(resourceId)
-      console.log(`Liked resource: ${resourceId}`)
-      // Refetch resources to update like count on UI
-      const response = await studyAPI.getResources()
-      setStudyResources(response.data)
-    } catch (error) {
-      console.error("Error liking resource:", error)
-      alert("Failed to like resource. Please try again.")
-    }
-  }
+    fetchProject()
+  }, [id]) // Re-run effect if ID changes
 
   if (loading) {
     return (
@@ -213,200 +44,154 @@ export default function StudyHub() {
 
   if (error) {
     return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
+      <div className="pt-16 min-h-screen flex flex-col items-center justify-center">
         <p className="text-red-500 text-lg">{error}</p>
+        <Link to="/project" className="mt-4 text-blue-600 hover:underline">
+          Go back to Projects
+        </Link>
+      </div>
+    )
+  }
+
+  if (!project) {
+    return (
+      <div className="pt-16 min-h-screen flex flex-col items-center justify-center">
+        <p className="text-gray-500 text-lg">Project not found.</p>
+        <Link to="/project" className="mt-4 text-blue-600 hover:underline">
+          Go back to Projects
+        </Link>
       </div>
     )
   }
 
   return (
-    <div className="pt-16 min-h-screen">
-      {/* Header */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-100 dark:from-gray-800 dark:to-gray-900">
-        <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Study Hub</h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Free study materials, notes, and resources to help you excel in your academic journey. All content is freely
-            available for learning.
-          </p>
-          {isAdmin() && (
-            <div className="mt-8">
-              <Link
-                to="/admin/study/new"
-                className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-              >
-                <Plus size={20} className="mr-2" />
-                Add New Resource
-              </Link>
+    <div className="pt-16 min-h-screen bg-gray-50 dark:bg-gray-900">
+      <article className="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg my-8">
+        <Link
+          to="/project"
+          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 mb-8"
+        >
+          <ArrowLeft size={20} className="mr-2" />
+          Back to all Projects
+        </Link>
+
+        {project.image && (
+          <div className="w-full max-w-2xl mx-auto mb-8 shadow-lg rounded-xl overflow-hidden bg-white dark:bg-gray-800 p-2">
+            <div className="aspect-video flex items-center justify-center overflow-hidden rounded-lg">
+              <img
+                src={project.image.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${project.image}` : project.image}
+                alt={project.title}
+                className="w-full h-full object-contain transition-transform duration-500 ease-in-out hover:scale-105"
+              />
             </div>
+          </div>
+        )}
+
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">{project.title}</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">{project.description}</p>
+
+        <div className="flex flex-wrap items-center text-sm text-gray-500 dark:text-gray-400 mb-8 space-x-4">
+          <span className="flex items-center">
+            <Calendar size={16} className="mr-1" />
+            Built: {project.builtDate}
+          </span>
+          <span className="flex items-center">
+            <Eye size={16} className="mr-1" />
+            Visitors: {(project.visitors || 0).toLocaleString()}
+          </span>
+          <span className="flex items-center">
+            <Star className="text-yellow-500 mr-1" size={16} />
+            {project.rating}/5
+          </span>
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
+              project.type === "Personal"
+                ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
+                : project.type === "Academic"
+                  ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
+                  : "bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200"
+            }`}
+          >
+            {project.type}
+          </span>
+        </div>
+
+        <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed mb-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Overview</h2>
+          <p>{project.longDescription}</p>
+        </div>
+
+        {project.techStack && project.techStack.length > 0 && (
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Tech Stack:</h3>
+            <div className="flex flex-wrap gap-2">
+              {project.techStack.map((tech, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {project.features && project.features.length > 0 && (
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Key Features:</h3>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-gray-600 dark:text-gray-300">
+              {project.features.map((feature, index) => (
+                <li key={index} className="flex items-center">
+                  <CheckCircle size={16} className="mr-2 text-green-500 flex-shrink-0" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6 flex flex-wrap gap-4">
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              <ExternalLink className="mr-2" size={20} />
+              Live Demo
+            </a>
+          )}
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-semibold"
+            >
+              <Github className="mr-2" size={20} />
+              GitHub Repository
+            </a>
           )}
         </div>
-      </section>
 
-      {/* Search and Filter */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto">
-          {/* Search Bar */}
-          <div className="relative max-w-md mx-auto mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search resources..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* Category Filter */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  selectedCategory === category
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Resources Grid */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredResources.map((resource) => (
-              <div
-                key={resource._id || resource.id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 group"
-              >
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3">
-                    <ResourceIcon iconNameOrUrl={resource.icon} className="text-red-500" size={24} />
-                    <div>
-                      <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md text-xs font-medium">
-                        {resource.category}
-                      </span>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-                    {resource.format}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {resource.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{resource.description}</p>
-
-                {/* Meta Info */}
-                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                  <div className="flex items-center space-x-4">
-                    <span className="flex items-center">
-                      <Calendar size={14} className="mr-1" />
-                      {resource.uploadDate}
-                    </span>
-                    <button
-                      onClick={() => handleLike(resource._id || resource.id)}
-                      className="flex items-center hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-                    >
-                      <Heart size={14} className="mr-1" />
-                      {resource.likes}
-                    </button>
-                  </div>
-                  <span className="flex items-center">
-                    <Download size={14} className="mr-1" />
-                    {(resource.downloads || 0).toLocaleString()}
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleDownload(resource._id || resource.id, resource.fileUrl)}
-                    className="flex-1 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                  >
-                    <Download size={16} className="mr-2" />
-                    Download
-                  </button>
-                  <button className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <Eye size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {filteredResources.length === 0 && (
-            <div className="text-center py-16">
-              <BookOpen size={64} className="mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-500 dark:text-gray-400 text-lg">No resources found matching your criteria.</p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">
-                {resourcesToDisplay.length}+
-              </div>
-              <div className="text-gray-600 dark:text-gray-300 font-medium">Resources Available</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold text-green-600 dark:text-green-400 mb-2">
-                {resourcesToDisplay.reduce((sum, resource) => sum + (resource.downloads || 0), 0).toLocaleString()}+
-              </div>
-              <div className="text-gray-600 dark:text-gray-300 font-medium">Total Downloads</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">50+</div>
-              <div className="text-gray-600 dark:text-gray-300 font-medium">Students Helped</div>
-            </div>
-            <div>
-              <div className="text-3xl lg:text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">
-                {categories.length - 1}
-              </div>
-              <div className="text-gray-600 dark:text-gray-300 font-medium">Subject Categories</div>
+        {project.tags && project.tags.length > 0 && (
+          <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Tags:</h3>
+            <div className="flex flex-wrap gap-2">
+              {project.tags.map((tag, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
+                >
+                  #{tag}
+                </span>
+              ))}
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Request Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Need Something Specific?</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
-            Can't find what you're looking for? Request a specific topic or resource, and I'll try to create or upload
-            it to the Study Hub.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="text"
-              placeholder="What topic do you need help with?"
-              className="flex-1 px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
-              Request
-            </button>
-          </div>
-        </div>
-      </section>
+        )}
+      </article>
     </div>
   )
 }

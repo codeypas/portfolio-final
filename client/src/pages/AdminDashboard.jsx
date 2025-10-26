@@ -8,9 +8,10 @@ import * as LucideIcons from "lucide-react" // Import all Lucide icons
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-final-2u9l.onrender.com"
 
+
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
-// Helper component for dynamic Lucide icons or image URLs
+// Helper component for dynamic Lucide icons or image URL
 const DynamicLucideIcon = ({ name, ...props }) => {
   const imageUrl = name && name.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${name}` : name
   if (imageUrl && (imageUrl.startsWith("http://") || imageUrl.startsWith("https://") || imageUrl.startsWith("blob:"))) {

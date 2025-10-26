@@ -16,8 +16,6 @@ import Footer from "./component/Footer"
 import BlogForm from "./pages/admin/BlogForm"
 import StudyForm from "./pages/admin/StudyForm"
 import ProjectForm from "./pages/admin/ProjectForm"
-// Import ProtectedRoute component
-import ProtectedRoute from "./components/ProtectedRoute"
 
 export default function App() {
   return (
@@ -53,6 +51,7 @@ export default function App() {
               <Route path="/admin/projects/edit/:id" element={<ProjectForm />} />
             </Routes>
             <Footer />
+            {import.meta.env.DEV && <DebugPanel />}
           </div>
         </BrowserRouter>
       </AuthProvider>

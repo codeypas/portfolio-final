@@ -1,3 +1,5 @@
+"use client"
+
 import resumee from "../component/resumee.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
@@ -9,7 +11,7 @@ import * as LucideIcons from "lucide-react"
 const DynamicLucideIcon = ({ name, ...props }) => {
   const IconComponent = LucideIcons[name]
   if (!IconComponent) {
-    return <LucideIcons.FileText {...props} /> 
+    return <LucideIcons.FileText {...props} />
   }
   return <IconComponent {...props} />
 }
@@ -17,7 +19,7 @@ const DynamicLucideIcon = ({ name, ...props }) => {
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-final-2u9l.onrender.com"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;  s
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
@@ -46,19 +48,48 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const [projectsRes, studyRes, blogsRes] = await Promise.all([
+        setError(null) // Reset error state on retry
+
+        const [projectsRes, studyRes, blogsRes] = await Promise.allSettled([
           projectAPI.getProjects(),
           studyAPI.getResources(),
           blogAPI.getBlogs(),
         ])
 
-        // Sort by creation date (assuming 'createdAt' field exists) and take top 3
-        setRecentProjects(projectsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
-        setRecentStudyResources(studyRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
-        setRecentBlogs(blogsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
+        if (projectsRes.status === "fulfilled") {
+          setRecentProjects(
+            projectsRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3),
+          )
+        } else {
+          console.error("Failed to fetch projects:", projectsRes.reason)
+          setRecentProjects([]) // Use empty array as fallback
+        }
+
+        if (studyRes.status === "fulfilled") {
+          setRecentStudyResources(
+            studyRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3),
+          )
+        } else {
+          console.error("Failed to fetch study resources:", studyRes.reason)
+          setRecentStudyResources([]) // Use empty array as fallback
+        }
+
+        if (blogsRes.status === "fulfilled") {
+          setRecentBlogs(blogsRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
+        } else {
+          console.error("Failed to fetch blogs:", blogsRes.reason)
+          setRecentBlogs([]) // Use empty array as fallback
+        }
+
+        if (projectsRes.status === "rejected" && studyRes.status === "rejected" && blogsRes.status === "rejected") {
+          setError("Unable to connect to server. Please check your internet connection or try again later.")
+        }
       } catch (err) {
-        console.error("Failed to fetch recent data:", err)
-        setError("Failed to load recent content.")
+        console.error("Unexpected error during data fetch:", err)
+        setError("An unexpected error occurred. Please refresh the page.")
+        setRecentProjects([])
+        setRecentStudyResources([])
+        setRecentBlogs([])
       } finally {
         setLoading(false)
       }
@@ -102,22 +133,35 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-xl text-gray-600 dark:text-gray-300">Loading recent content...</p>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
+      <div className="pt-16 min-h-screen">
+        {/* Hero Section with loading state */}
+        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto text-center">
+            <div className="animate-pulse">
+              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-8 max-w-md mx-auto"></div>
+              <div className="flex justify-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     )
   }
 
   return (
     <div className="pt-16">
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-4">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-red-700 dark:text-red-400">{error} Some content may not be available.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">

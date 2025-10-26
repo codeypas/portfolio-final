@@ -1,5 +1,3 @@
-// const API_BASE_URL = import.meta.env.VITE_API_URL;
-
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Eye, EyeOff, User, Mail, Lock, AlertCircle, CheckCircle } from "lucide-react"
