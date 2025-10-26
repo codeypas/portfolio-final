@@ -4,7 +4,7 @@ import { blogAPI } from "../services/api"
 import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-final-2u9l.onrender.com"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
