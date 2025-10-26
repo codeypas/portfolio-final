@@ -17,8 +17,8 @@ export default function ProjectDetails() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    if (!id) {
-      setError("Project ID is missing.")
+    if (!id || id === "undefined" || id.trim() === "") {
+      setError("Project ID is missing or invalid. Please select a valid project.")
       setLoading(false)
       return
     }
@@ -27,13 +27,17 @@ export default function ProjectDetails() {
       setLoading(true)
       setError(null)
       try {
+        console.log("[v0] Fetching project with ID:", id)
         const response = await projectAPI.getProject(id)
         setProject(response.data)
         // Increment visitor count only if successfully fetched from API
         await projectAPI.incrementVisitor(id)
       } catch (err) {
-        console.error("Failed to fetch project details:", err)
-        setError("Failed to load project details. It might not exist or there was a server error.")
+        console.error("[v0] Failed to fetch project details:", err.response?.status, err.response?.data?.message)
+        setError(
+          err.response?.data?.message ||
+            "Failed to load project details. It might not exist or there was a server error.",
+        )
       } finally {
         setLoading(false)
       }

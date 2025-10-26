@@ -50,7 +50,17 @@ export const getProjects = async (req, res, next) => {
 
 export const getProject = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id)
+    const { id } = req.params
+    if (!id || id === "undefined") {
+      return next(errorHandler(400, "Invalid project ID provided"))
+    }
+
+    // Validate MongoDB ObjectId format
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return next(errorHandler(400, "Invalid project ID format"))
+    }
+
+    const project = await Project.findById(id)
     if (!project) return next(errorHandler(404, "Project not found"))
     res.status(200).json(project)
   } catch (error) {
