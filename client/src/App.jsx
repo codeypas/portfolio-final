@@ -12,6 +12,10 @@ import Login from "./pages/Login"
 import AdminDashboard from "./pages/AdminDashboard"
 import Header from "./component/Header"
 import Footer from "./component/Footer"
+
+import ProtectedRoute from "./components/ProtectedRoute";
+import DebugPanel from "./components/DebugPanel";
+
 // Import new admin form components
 import BlogForm from "./pages/admin/BlogForm"
 import StudyForm from "./pages/admin/StudyForm"
