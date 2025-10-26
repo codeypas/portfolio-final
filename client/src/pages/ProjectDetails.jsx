@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { projectAPI } from "../services/api"
@@ -5,7 +7,6 @@ import { Calendar, Eye, Star, Github, ExternalLink, ArrowLeft, CheckCircle } fro
 
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
-
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -16,6 +17,12 @@ export default function ProjectDetails() {
   const [error, setError] = useState(null)
 
   useEffect(() => {
+    if (!id) {
+      setError("Project ID is missing.")
+      setLoading(false)
+      return
+    }
+
     const fetchProject = async () => {
       setLoading(true)
       setError(null)

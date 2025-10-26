@@ -30,7 +30,7 @@ const __dirname = path.dirname(__filename)
 const parseOrigins = () => {
   const origins = ["http://localhost:5173"]
   if (process.env.FRONTEND_ORIGIN) {
-    const envOrigins = process.env.FRONTEND_ORIGIN.split(",").map((o) => o.trim())
+    const envOrigins = process.env.FRONTEND_ORIGIN.split(",").map((o) => o.trim().replace(/\/$/, ""))
     origins.push(...envOrigins)
   }
   return origins
@@ -42,7 +42,8 @@ console.log("[v0] Allowed CORS origins:", allowedOrigins)
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      const normalizedOrigin = origin ? origin.replace(/\/$/, "") : origin
+      if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) {
         callback(null, true)
       } else {
         console.warn(`[v0] CORS blocked origin: ${origin}`)
