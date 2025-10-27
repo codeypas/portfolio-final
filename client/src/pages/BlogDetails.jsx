@@ -1,10 +1,12 @@
+"use client"
+
 import { useState, useEffect, useRef } from "react"
 import { useParams, Link } from "react-router-dom"
 import { blogAPI } from "../services/api"
 import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -153,9 +155,10 @@ export default function BlogDetails() {
           </span>
         </div>
 
-        <div className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed">
-          <p>{blog.content}</p>
-        </div>
+        <div
+          className="prose dark:prose-invert max-w-none text-gray-800 dark:text-gray-200 leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
 
         {blog.tags && blog.tags.length > 0 && (
           <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
@@ -173,9 +176,29 @@ export default function BlogDetails() {
             </div>
           </div>
         )}
-
-        {/* Add comments section here later */}
       </article>
+
+      <style>{`
+        .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+          margin-top: 1.5em;
+          margin-bottom: 0.5em;
+          font-weight: 700;
+        }
+        .prose h1 { font-size: 2em; }
+        .prose h2 { font-size: 1.5em; }
+        .prose h3 { font-size: 1.25em; }
+        .prose p { margin-bottom: 1em; }
+        .prose ul, .prose ol { margin-left: 2em; margin-bottom: 1em; }
+        .prose li { margin-bottom: 0.5em; }
+        .prose img { max-width: 100%; height: auto; margin: 1em 0; border-radius: 0.5em; }
+        .prose a { color: #2563eb; text-decoration: underline; }
+        .dark .prose a { color: #60a5fa; }
+        .prose blockquote { border-left: 4px solid #e5e7eb; padding-left: 1em; margin: 1em 0; font-style: italic; }
+        .dark .prose blockquote { border-left-color: #4b5563; }
+        .prose code { background-color: #f3f4f6; padding: 0.2em 0.4em; border-radius: 0.25em; font-family: monospace; }
+        .dark .prose code { background-color: #374151; }
+        .prose pre { background-color: #1f2937; color: #f3f4f6; padding: 1em; border-radius: 0.5em; overflow-x: auto; }
+      `}</style>
     </div>
   )
 }

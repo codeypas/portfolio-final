@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { Download, Eye, Calendar, Heart, Search, FileText, Video, Code, BookOpen, Plus } from "lucide-react"
 import { Link } from "react-router-dom"

@@ -1,11 +1,16 @@
-import { useState, useEffect } from "react"
+"use client"
+
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { blogAPI } from "../../services/api"
-import { ArrowLeft, Save, Loader2, Bold, Italic, LinkIcon, ImageIcon, List } from "lucide-react"
+import { ArrowLeft, Save, Loader2 } from "lucide-react"
+import ReactQuill from "react-quill"
+import "react-quill/dist/quill.snow.css"
 
 export default function BlogForm() {
   const navigate = useNavigate()
   const { id } = useParams()
+  const quillRef = useRef(null)
   const [formData, setFormData] = useState({
     title: "",
     summary: "",
@@ -19,7 +24,40 @@ export default function BlogForm() {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [isEditMode, setIsEditMode] = useState(false)
-  const [contentEditorActive, setContentEditorActive] = useState(false) // Track editor focus
+
+  const modules = {
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ font: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+      [{ align: [] }],
+      ["blockquote", "code-block"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image", "video"],
+      ["clean"],
+    ],
+  }
+
+  const formats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "color",
+    "background",
+    "font",
+    "size",
+    "align",
+    "blockquote",
+    "code-block",
+    "list",
+    "link",
+    "image",
+    "video",
+  ]
 
   useEffect(() => {
     if (id) {
@@ -52,6 +90,10 @@ export default function BlogForm() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
+  const handleContentChange = (value) => {
+    setFormData({ ...formData, content: value })
+  }
+
   const handleThumbnailChange = (e) => {
     const file = e.target.files[0]
     if (file) {
@@ -61,45 +103,6 @@ export default function BlogForm() {
       setSelectedThumbnailFile(null)
       setFormData({ ...formData, thumbnail: "" })
     }
-  }
-
-  const applyFormatting = (format) => {
-    const textarea = document.getElementById("content")
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const selectedText = formData.content.substring(start, end)
-    let formattedText = ""
-
-    switch (format) {
-      case "bold":
-        formattedText = `**${selectedText}**`
-        break
-      case "italic":
-        formattedText = `*${selectedText}*`
-        break
-      case "link":
-        formattedText = `[${selectedText}](url)`
-        break
-      case "image":
-        formattedText = `![alt text](image-url)`
-        break
-      case "list":
-        formattedText = `\n- ${selectedText}\n- Item 2\n- Item 3`
-        break
-      case "linebreak":
-        formattedText = `${selectedText}\n`
-        break
-      default:
-        return
-    }
-
-    const newContent = formData.content.substring(0, start) + formattedText + formData.content.substring(end)
-    setFormData({ ...formData, content: newContent })
-    setTimeout(() => {
-      textarea.focus()
-      textarea.selectionStart = start + formattedText.length
-      textarea.selectionEnd = start + formattedText.length
-    }, 0)
   }
 
   const handleSubmit = async (e) => {
@@ -157,7 +160,7 @@ export default function BlogForm() {
 
   return (
     <div className="pt-16 min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-      <div className="max-w-3xl w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8">
+      <div className="max-w-4xl w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 my-8">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
             {isEditMode ? "Edit Blog Post" : "Create New Blog Post"}
@@ -195,6 +198,7 @@ export default function BlogForm() {
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Blog Post Title"
+              required
             />
           </div>
 
@@ -210,77 +214,27 @@ export default function BlogForm() {
               onChange={handleChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               placeholder="A short summary of the blog post"
+              required
             />
           </div>
 
           <div>
             <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Content
-              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                (Use **text** for bold, *text* for italic, [text](url) for links, ![alt](url) for images)
-              </span>
             </label>
-            <div className="mb-2 flex flex-wrap gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-t-lg border border-b-0 border-gray-300 dark:border-gray-600">
-              <button
-                type="button"
-                onClick={() => applyFormatting("bold")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                title="Bold"
-              >
-                <Bold size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => applyFormatting("italic")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                title="Italic"
-              >
-                <Italic size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => applyFormatting("link")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                title="Link"
-              >
-                <LinkIcon size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => applyFormatting("image")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                title="Image"
-              >
-                <ImageIcon size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => applyFormatting("list")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors"
-                title="List"
-              >
-                <List size={16} />
-              </button>
-              <button
-                type="button"
-                onClick={() => applyFormatting("linebreak")}
-                className="p-2 bg-white dark:bg-gray-600 rounded hover:bg-gray-200 dark:hover:bg-gray-500 transition-colors text-xs font-bold"
-                title="Line Break"
-              >
-                ↵
-              </button>
+            <div className="bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden">
+              <ReactQuill
+                ref={quillRef}
+                theme="snow"
+                value={formData.content}
+                onChange={handleContentChange}
+                modules={modules}
+                formats={formats}
+                placeholder="Write your blog content here..."
+                className="quill-editor dark:text-white"
+                style={{ minHeight: "400px" }}
+              />
             </div>
-            <textarea
-              id="content"
-              name="content"
-              rows={10}
-              value={formData.content}
-              onChange={handleChange}
-              onFocus={() => setContentEditorActive(true)}
-              onBlur={() => setContentEditorActive(false)}
-              className="w-full px-4 py-3 rounded-b-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
-              placeholder="Write your blog content here... Use **bold**, *italic*, [link](url), ![image](url), and line breaks"
-            />
           </div>
 
           <div>
@@ -356,6 +310,38 @@ export default function BlogForm() {
           </button>
         </form>
       </div>
+
+      <style>{`
+        .quill-editor .ql-toolbar {
+          border-color: #d1d5db;
+          background-color: #f9fafb;
+        }
+        .quill-editor .ql-container {
+          border-color: #d1d5db;
+          font-size: 16px;
+        }
+        .dark .quill-editor .ql-toolbar {
+          border-color: #4b5563;
+          background-color: #374151;
+        }
+        .dark .quill-editor .ql-container {
+          border-color: #4b5563;
+          background-color: #1f2937;
+          color: #f3f4f6;
+        }
+        .dark .quill-editor .ql-editor {
+          color: #f3f4f6;
+        }
+        .dark .quill-editor .ql-toolbar.ql-snow .ql-picker-label {
+          color: #f3f4f6;
+        }
+        .dark .quill-editor .ql-toolbar.ql-snow .ql-stroke {
+          stroke: #9ca3af;
+        }
+        .dark .quill-editor .ql-toolbar.ql-snow .ql-fill {
+          fill: #9ca3af;
+        }
+      `}</style>
     </div>
   )
 }
