@@ -1,10 +1,12 @@
+"use client"
+
 import { useState, useEffect, useRef } from "react"
 import { useParams, Link } from "react-router-dom"
 import { blogAPI } from "../services/api"
 import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -13,6 +15,7 @@ export default function BlogDetails() {
   const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [thumbnailUrl, setThumbnailUrl] = useState(null)
   const hasIncrementedView = useRef(false)
 
   const sampleBlogPosts = [
@@ -76,7 +79,17 @@ export default function BlogDetails() {
         }
       }
 
-      setBlog(fetchedBlog)
+      if (fetchedBlog) {
+        setBlog(fetchedBlog)
+
+        const thumbUrl = fetchedBlog.thumbnail
+          ? fetchedBlog.thumbnail.startsWith("/uploads/")
+            ? `${UPLOAD_BASE_URL}${fetchedBlog.thumbnail}`
+            : fetchedBlog.thumbnail
+          : null
+        setThumbnailUrl(thumbUrl)
+      }
+
       setLoading(false)
     }
     fetchBlog()
@@ -123,12 +136,15 @@ export default function BlogDetails() {
           Back to all Blogs
         </Link>
 
-        {blog.thumbnail && (
-          <div className="w-full max-w-md mx-auto h-85 w-85 overflow-hidden rounded-lg mb-8 shadow-md group bg-white p-2">
+        {thumbnailUrl && (
+          <div className="w-full max-w-md mx-auto h-85 overflow-hidden rounded-lg mb-8 shadow-md group bg-white p-2">
             <div className="w-full h-full flex items-center justify-center overflow-hidden rounded-md">
               <img
-                src={blog.thumbnail.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${blog.thumbnail}` : blog.thumbnail}
-                alt={blog.title}
+                src={thumbnailUrl || "/placeholder.svg"}
+                alt={blog?.title}
+                onError={(e) => {
+                  e.target.src = "/placeholder.svg?height=200&width=300&text=Blog+Post"
+                }}
                 className="max-h-full max-w-full object-contain transition-transform duration-500 ease-in-out group-hover:scale-105"
               />
             </div>

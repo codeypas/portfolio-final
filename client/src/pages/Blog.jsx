@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from "react"
 import { Calendar, Clock, Eye, Tag, ArrowRight, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -5,7 +7,7 @@ import { useAuth } from "../context/AuthContext"
 import { blogAPI } from "../services/api"
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -98,14 +100,12 @@ export default function Blog() {
     const fetchBlogs = async () => {
       try {
         setLoading(true)
-        setError(null) // Clear previous errors
         const response = await blogAPI.getBlogs()
-        setBlogPosts(response.data || [])
+        setBlogPosts(response.data)
       } catch (err) {
         console.error("Failed to fetch blogs:", err)
-        setBlogPosts([]) // Use sample data as fallback
-        // Only show error in console, not blocking UI
-        console.warn("Using sample blog data due to API failure")
+        setError("Failed to load blogs. Please try again later.")
+        setBlogPosts([]) // Clear posts on error
       } finally {
         setLoading(false)
       }
@@ -113,6 +113,7 @@ export default function Blog() {
     fetchBlogs()
   }, [])
 
+  // Determine which posts to display: fetched posts if available, otherwise sample posts
   const postsToDisplay = blogPosts.length > 0 ? blogPosts : sampleBlogPosts
 
   const filteredPosts =
@@ -126,21 +127,16 @@ export default function Blog() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="pt-16 min-h-screen flex items-center justify-center">
+        <p className="text-red-500 text-lg">{error}</p>
+      </div>
+    )
+  }
+
   return (
     <div className="pt-16 min-h-screen">
-      {/* Error Banner */}
-      {error && (
-        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-4 mx-4 mt-4 rounded">
-          <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Unable to load latest blogs from server. Showing sample content.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto text-center">
@@ -187,80 +183,88 @@ export default function Blog() {
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredPosts.map((post) => (
-              <article
-                key={post._id || post.id} // Use _id for fetched data, id for sample
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
-              >
-                {/* Thumbnail */}
-                <Link to={`/blog/${post._id || post.id}`}>
-                  <div className="aspect-video overflow-hidden">
-                    <img
-                      src={
-                        post.thumbnail.startsWith("/uploads/")
-                          ? `${UPLOAD_BASE_URL}${post.thumbnail}`
-                          : post.thumbnail || "/placeholder.svg"
-                      }
-                      alt={post.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                </Link>
+            {filteredPosts.map((post) => {
+              const thumbnailUrl = post.thumbnail
+                ? post.thumbnail.startsWith("/uploads/")
+                  ? `${UPLOAD_BASE_URL}${post.thumbnail}`
+                  : post.thumbnail
+                : "/placeholder.svg"
 
-                {/* Content */}
-                <div className="p-6">
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {(post.tags || []).slice(0, 3).map((tag, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md text-xs font-medium"
-                      >
-                        <Tag size={12} className="mr-1" />
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Title */}
+              return (
+                <article
+                  key={post._id || post.id}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                >
+                  {/* Thumbnail */}
                   <Link to={`/blog/${post._id || post.id}`}>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                      {post.title}
-                    </h2>
+                    <div className="aspect-video overflow-hidden bg-gray-200 dark:bg-gray-700">
+                      <img
+                        src={thumbnailUrl || "/placeholder.svg"}
+                        alt={post.title}
+                        onError={(e) => {
+                          e.target.src = "/placeholder.svg?height=200&width=300&text=Blog+Post"
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                    </div>
                   </Link>
 
-                  {/* Summary */}
-                  <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.summary}</p>
+                  {/* Content */}
+                  <div className="p-6">
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      {(post.tags || []).slice(0, 3).map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-md text-xs font-medium"
+                        >
+                          <Tag size={12} className="mr-1" />
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
 
-                  {/* Meta Info */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
-                    <div className="flex items-center space-x-4">
+                    {/* Title */}
+                    <Link to={`/blog/${post._id || post.id}`}>
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {post.title}
+                      </h2>
+                    </Link>
+
+                    {/* Summary */}
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">{post.summary}</p>
+
+                    {/* Meta Info */}
+                    <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                      <div className="flex items-center space-x-4">
+                        <span className="flex items-center">
+                          <Calendar size={14} className="mr-1" />
+                          {new Date(post.createdAt || post.date).toLocaleDateString()}{" "}
+                        </span>
+                        <span className="flex items-center">
+                          <Clock size={14} className="mr-1" />
+                          {post.readTime || "N/A"}
+                        </span>
+                      </div>
                       <span className="flex items-center">
-                        <Calendar size={14} className="mr-1" />
-                        {new Date(post.createdAt || post.date).toLocaleDateString()}{" "}
-                      </span>
-                      <span className="flex items-center">
-                        <Clock size={14} className="mr-1" />
-                        {post.readTime || "N/A"}
+                        <Eye size={14} className="mr-1" />
+                        {(post.views || 0).toLocaleString()}
                       </span>
                     </div>
-                    <span className="flex items-center">
-                      <Eye size={14} className="mr-1" />
-                      {(post.views || 0).toLocaleString()}
-                    </span>
-                  </div>
 
-                  {/* Read More Button */}
-                  <Link
-                    to={`/blog/${post._id || post.id}`}
-                    className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium group-hover:translate-x-1 transition-transform"
-                  >
-                    Read More
-                    <ArrowRight size={16} className="ml-1" />
-                  </Link>
-                </div>
-              </article>
-            ))}
+                    {/* Read More Button */}
+                    <Link
+                      to={`/blog/${post._id || post.id}`}
+                      className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium group-hover:translate-x-1 transition-transform"
+                    >
+                      Read More
+                      <ArrowRight size={16} className="ml-1" />
+                    </Link>
+                  </div>
+                </article>
+              )
+            })}
           </div>
 
           {filteredPosts.length === 0 && (

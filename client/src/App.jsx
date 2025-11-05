@@ -12,20 +12,22 @@ import Login from "./pages/Login"
 import AdminDashboard from "./pages/AdminDashboard"
 import Header from "./component/Header"
 import Footer from "./component/Footer"
-
-import ProtectedRoute from "./components/ProtectedRoute";
-import DebugPanel from "./components/DebugPanel";
-
 // Import new admin form components
 import BlogForm from "./pages/admin/BlogForm"
 import StudyForm from "./pages/admin/StudyForm"
 import ProjectForm from "./pages/admin/ProjectForm"
+// Import ProtectedRoute component
+import ProtectedRoute from "./components/ProtectedRoute"
+import ColdStartAlert from "./component/ColdStartAlert"
+// Import ColdStartAlert component
+
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
+          <ColdStartAlert />
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
             <Header />
             <Routes>
@@ -55,7 +57,6 @@ export default function App() {
               <Route path="/admin/projects/edit/:id" element={<ProjectForm />} />
             </Routes>
             <Footer />
-            {import.meta.env.DEV && <DebugPanel />}
           </div>
         </BrowserRouter>
       </AuthProvider>
