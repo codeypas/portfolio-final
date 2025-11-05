@@ -15,7 +15,7 @@ export default function ColdStartAlert() {
       // Check if backend is responding
       const checkBackendHealth = async () => {
         try {
-          const apiUrl = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/+$/, "")
+          const apiUrl = (import.meta.env.VITE_API_URL || "https://portfolio-backend-ohp9.onrender.com/api").replace(/\/+$/, "")
           const healthUrl = `${apiUrl}/health`
 
           const response = await fetch(healthUrl, {
