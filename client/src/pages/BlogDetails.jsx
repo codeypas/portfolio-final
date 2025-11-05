@@ -1,6 +1,4 @@
-"use client"
-
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useMemo } from "react"
 import { useParams, Link } from "react-router-dom"
 import { blogAPI } from "../services/api"
 import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
@@ -8,14 +6,11 @@ import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
-
 export default function BlogDetails() {
   const { id } = useParams()
   const [blog, setBlog] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [thumbnailUrl, setThumbnailUrl] = useState(null)
   const hasIncrementedView = useRef(false)
 
   const sampleBlogPosts = [
@@ -81,19 +76,24 @@ export default function BlogDetails() {
 
       if (fetchedBlog) {
         setBlog(fetchedBlog)
-
-        const thumbUrl = fetchedBlog.thumbnail
-          ? fetchedBlog.thumbnail.startsWith("/uploads/")
-            ? `${UPLOAD_BASE_URL}${fetchedBlog.thumbnail}`
-            : fetchedBlog.thumbnail
-          : null
-        setThumbnailUrl(thumbUrl)
       }
 
       setLoading(false)
     }
     fetchBlog()
   }, [id])
+
+  const thumbnailUrl = useMemo(() => {
+    if (!blog?.thumbnail) return null
+
+    const url = blog.thumbnail
+    if (url.startsWith("http")) {
+      return url // Use as-is if it's already a full URL
+    } else if (url.startsWith("/uploads/")) {
+      return `${UPLOAD_BASE_URL}${url}` // Prepend base URL for relative paths
+    }
+    return url // Use placeholder or other URLs as-is
+  }, [blog?.thumbnail])
 
   if (loading) {
     return (

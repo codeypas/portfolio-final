@@ -9,8 +9,6 @@ import { blogAPI } from "../services/api"
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
-
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("All")
   const { isAdmin } = useAuth()
@@ -185,9 +183,11 @@ export default function Blog() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredPosts.map((post) => {
               const thumbnailUrl = post.thumbnail
-                ? post.thumbnail.startsWith("/uploads/")
-                  ? `${UPLOAD_BASE_URL}${post.thumbnail}`
-                  : post.thumbnail
+                ? post.thumbnail.startsWith("http")
+                  ? post.thumbnail // Use as-is if it's already a full URL
+                  : post.thumbnail.startsWith("/uploads/")
+                    ? `${UPLOAD_BASE_URL}${post.thumbnail}` // Prepend base URL for relative paths
+                    : post.thumbnail // Use as-is for placeholder URLs
                 : "/placeholder.svg"
 
               return (
@@ -202,6 +202,7 @@ export default function Blog() {
                         src={thumbnailUrl || "/placeholder.svg"}
                         alt={post.title}
                         onError={(e) => {
+                          console.log("[v0] Image failed to load, using fallback:", thumbnailUrl)
                           e.target.src = "/placeholder.svg?height=200&width=300&text=Blog+Post"
                         }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"

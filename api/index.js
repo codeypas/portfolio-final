@@ -39,6 +39,9 @@ const parseOrigins = () => {
 const allowedOrigins = parseOrigins()
 console.log("[v0] Allowed CORS origins:", allowedOrigins)
 
+app.use(express.json())
+app.use(cookieParser())
+
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -54,8 +57,10 @@ app.use(
   }),
 )
 
-app.use(express.json())
-app.use(cookieParser())
+app.use((req, res, next) => {
+  console.log(`[v0] ${req.method} ${req.path} - Cookies received:`, req.cookies)
+  next()
+})
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")))
 app.use("/uploads/blogs", express.static(path.join(__dirname, "uploads/blogs")))

@@ -8,41 +8,51 @@ export default function ColdStartAlert() {
   const [dismissed, setDismissed] = useState(false)
 
   useEffect(() => {
-    // Check if user has already dismissed this alert
-    const alertDismissed = localStorage.getItem("coldStartAlertDismissed")
+    // Check if user has already dismissed this alert in this session
+    const alertDismissed = sessionStorage.getItem("coldStartAlertDismissed")
 
     if (!alertDismissed) {
-      // Check if backend is responding
-      const checkBackendHealth = async () => {
-        try {
-          const apiUrl = (import.meta.env.VITE_API_URL || "https://portfolio-backend-ohp9.onrender.com/api").replace(/\/+$/, "")
-          const healthUrl = `${apiUrl}/health`
+      setTimeout(() => {
+        const checkBackendHealth = async () => {
+          try {
+            const apiBase = (import.meta.env.VITE_API_URL || "https://portfolio-backend-ohp9.onrender.com/api").replace(/\/+$/, "")
+            const healthUrl = `${apiBase}/health`
 
-          const response = await fetch(healthUrl, {
-            method: "GET",
-            timeout: 5000,
-          })
+            console.log("[v0] ColdStartAlert: Checking health endpoint:", healthUrl)
 
-          // If backend is not responding (timeout or error), show alert
-          if (!response.ok) {
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 8000)
+
+            const response = await fetch(healthUrl, {
+              method: "GET",
+              signal: controller.signal,
+              credentials: "include",
+            })
+
+            clearTimeout(timeoutId)
+
+            if (response.ok) {
+              console.log("[v0] Backend is healthy, not showing cold start alert")
+              return
+            }
+
+            console.log("[v0] Backend health check failed with status:", response.status)
+            setIsVisible(true)
+          } catch (error) {
+            console.log("[v0] Backend health check failed (expected on cold start):", error.message)
             setIsVisible(true)
           }
-        } catch (error) {
-          // Backend is not responding (cold start)
-          setIsVisible(true)
         }
-      }
 
-      // Check health after a small delay to allow page to start loading
-      const timer = setTimeout(checkBackendHealth, 1000)
-      return () => clearTimeout(timer)
+        checkBackendHealth()
+      }, 500) // Wait 500ms for CORS to initialize
     }
   }, [])
 
   const handleDismiss = () => {
     setDismissed(true)
     setIsVisible(false)
-    localStorage.setItem("coldStartAlertDismissed", "true")
+    sessionStorage.setItem("coldStartAlertDismissed", "true")
   }
 
   if (!isVisible || dismissed) return null

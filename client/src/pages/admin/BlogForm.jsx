@@ -96,7 +96,9 @@ export default function BlogForm() {
     const file = e.target.files[0]
     if (file) {
       setSelectedThumbnailFile(file)
-      setFormData({ ...formData, thumbnail: URL.createObjectURL(file) })
+      const previewUrl = URL.createObjectURL(file)
+      setFormData({ ...formData, thumbnail: previewUrl })
+      console.log("[v0] Thumbnail file selected:", file.name, "Size:", file.size)
     } else {
       setSelectedThumbnailFile(null)
       setFormData({ ...formData, thumbnail: "" })
@@ -110,22 +112,23 @@ export default function BlogForm() {
     setSuccess(null)
 
     const dataToSend = new FormData()
-    for (const key in formData) {
-      if (key === "thumbnail" && selectedThumbnailFile) {
-        // Skip, the file will be appended separately
-      } else if (key === "tags") {
-        formData[key]
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean)
-          .forEach((tag) => dataToSend.append("tags[]", tag))
-      } else {
-        dataToSend.append(key, formData[key])
-      }
-    }
+
+    dataToSend.append("title", formData.title)
+    dataToSend.append("summary", formData.summary)
+    dataToSend.append("content", formData.content)
+    dataToSend.append("category", formData.category)
+
+    const tagsArray = formData.tags
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)
+    tagsArray.forEach((tag) => dataToSend.append("tags[]", tag))
 
     if (selectedThumbnailFile) {
+      console.log("[v0] Appending thumbnail file:", selectedThumbnailFile.name)
       dataToSend.append("thumbnail", selectedThumbnailFile)
+    } else if (formData.thumbnail && !formData.thumbnail.startsWith("blob:")) {
+      console.log("[v0] Using existing thumbnail from database")
     }
 
     try {
@@ -146,10 +149,10 @@ export default function BlogForm() {
         })
         setSelectedThumbnailFile(null)
       }
-      console.log("Operation successful:", res.data)
+      console.log("[v0] Blog operation successful:", res.data)
       setTimeout(() => navigate("/admin"), 1500)
     } catch (err) {
-      console.error("Error saving blog:", err)
+      console.error("[v0] Error saving blog:", err)
       setError(err.response?.data?.message || "Failed to save blog. Check console for details.")
     } finally {
       setLoading(false)
@@ -275,7 +278,7 @@ export default function BlogForm() {
               name="thumbnail"
               accept="image/*"
               onChange={handleThumbnailChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
             />
             {(formData.thumbnail || isEditMode) && (
               <div className="mt-4">
