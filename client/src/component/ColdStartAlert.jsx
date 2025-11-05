@@ -15,7 +15,7 @@ export default function ColdStartAlert() {
       setTimeout(() => {
         const checkBackendHealth = async () => {
           try {
-            const apiBase = (import.meta.env.VITE_API_URL || "https://portfolio-backend-ohp9.onrender.com/api").replace(/\/+$/, "")
+            const apiBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/+$/, "")
             const healthUrl = `${apiBase}/health`
 
             console.log("[v0] ColdStartAlert: Checking health endpoint:", healthUrl)
