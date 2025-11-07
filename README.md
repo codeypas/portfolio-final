@@ -3,7 +3,7 @@
 This is my **personal portfolio website** built to showcase my skills, projects, blogs, and study materials.  
 The site is designed with **simplicity, uniqueness, and interactivity** in mind using modern web technologies.  
 
-I will share here my **blogs, projects, and notes** to help students in need — including **placement prep, DSA, and development resources**. 
+I will share here my **blogs, projects, and notes** to help students in need, including **placement prep, DSA, and development resources**. 
 
 ****Let’s connect, learn, and grow together!** ** 
 
