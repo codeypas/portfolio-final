@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useEffect } from "react"
 import { X, AlertTriangle } from "lucide-react"
 
@@ -65,8 +63,7 @@ export default function ColdStartAlert() {
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Server Starting</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              The backend is hosted on Render's free tier, which puts it to sleep when inactive. Please refresh the page
-              — it may take around 40–50 seconds for the server to start.
+              The backend is hosted on Render's free tier, which puts it to sleep when inactive. Please refresh the page it may take upto 1 minute for the server to start.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               Thank you for your patience! The server will be ready shortly.
