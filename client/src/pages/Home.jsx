@@ -1,5 +1,3 @@
-"use client"
-
 import resumee from "../component/resumee.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
@@ -24,7 +22,8 @@ const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfol
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
-  const texts = ["Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Innovation Builder"]
+  // const texts = ["Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Innovation Builder"]
+  const texts = ["Full-Stack Developer","Software Developer","Blockchain Enthusiast","Problem Solver", "Innovation Builder", "Lifelong Learner"]
 
   const [recentProjects, setRecentProjects] = useState([])
   const [recentStudyResources, setRecentStudyResources] = useState([])
