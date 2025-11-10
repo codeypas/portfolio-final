@@ -17,12 +17,11 @@ const DynamicLucideIcon = ({ name, ...props }) => {
 // Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;  s
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
-  // const texts = ["Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Innovation Builder"]
+
   const texts = ["Full-Stack Developer","Software Developer","Blockchain Enthusiast","Problem Solver", "Innovation Builder", "Lifelong Learner"]
 
   const [recentProjects, setRecentProjects] = useState([])
@@ -179,8 +178,7 @@ export default function Home() {
               </div>
 
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
-                I build ideas, believe in innovation, and love to create real-world projects. From React to Web3 —
-                crafting clean, scalable code that makes a difference.
+                I love turning ideas into reality through code. I’m passionate about innovation and problem-solving, building real-world solutions with clean design and scalable development from React to Web3.
               </p>
 
               {/* CTA Buttons */}
@@ -228,6 +226,9 @@ export default function Home() {
                 >
                   <Github className="text-gray-800 dark:text-white" size={24} />
                 </a>
+
+
+
                 <a
                   href="mailto:bjbestintheworld@gmail.com"
                   className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow"
