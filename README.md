@@ -3,7 +3,7 @@
 This is my **personal portfolio website** built to showcase my skills, projects, blogs, and study materials.  
 The site is designed with **simplicity, uniqueness, and interactivity** in mind using modern web technologies.  
 
-I will share here my **blogs, projects, and notes** to help students in need — including **placement prep, DSA, and development resources**. 
+I will share here my **blogs, projects, and notes** to help students in need, including **placement prep, DSA, and development resources**. 
 
 ****Let’s connect, learn, and grow together!** ** 
 
@@ -32,43 +32,11 @@ I will share here my **blogs, projects, and notes** to help students in need —
 
 ---
 
-## 🚀 Installation & Setup
+## 🚀 Clone the repository:
 
-1. Clone the repository:
    ```bash
    git clone https://github.com/codeypas/portfolio-final
-   cd portfolio-final
    ```
-
-2. Install dependencies:
-   ```bash
-   cd api
-   ```
-   
-3. Run the development server:
-   ```bash
-   npm install
-   ```
-
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
-   
-5. Run the development server:
-   ```bash
-   cd client
-   ```
-
-6. Build for production:
-   ```bash
-   npm install
-   ```
-7. Run the development server:
-   ```bash
-   npm run dev
-   ```
-
 ---
 
 ## 📫 Contact
