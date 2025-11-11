@@ -1,4 +1,4 @@
-"use client"
+import AdBanner from "../components/AdBanner"
 
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
@@ -203,6 +203,10 @@ export default function ProjectDetails() {
           </div>
         )}
       </article>
+
+      <AdBanner slot="2418207987" />
+
+
     </div>
   )
 }

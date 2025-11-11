@@ -1,4 +1,4 @@
-"use client"
+import AdBanner from "../components/AdBanner"
 
 import { useState, useEffect } from "react"
 import { Calendar, Clock, Eye, Tag, ArrowRight, Plus } from "lucide-react"
@@ -153,6 +153,12 @@ export default function Blog() {
               </Link>
             </div>
           )}
+
+
+          <AdBanner slot="9097783517" />
+
+
+
         </div>
       </section>
 

@@ -1,3 +1,4 @@
+import AdBanner from "../components/AdBanner"
 import { useState } from "react"
 import resumee from "../component/resumee.pdf"
 import {
@@ -203,6 +204,11 @@ export default function Contact() {
                 )}
               </button>
             </form>
+
+
+            <AdBanner slot="7510752562" />
+
+
           </div>
 
           {/* Contact Info & Map */}

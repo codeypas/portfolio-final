@@ -1,3 +1,4 @@
+import AdBanner from "../components/AdBanner"
 import { useState, useEffect } from "react"
 import { Download, Eye, Calendar, Heart, Search, FileText, Video, Code, BookOpen, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -261,6 +262,8 @@ export default function StudyHub() {
         </div>
       </section>
 
+      <AdBanner slot="9097783517" />
+
       {/* Search and Filter */}
       <section className="py-8 px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto">
@@ -294,6 +297,8 @@ export default function StudyHub() {
           </div>
         </div>
       </section>
+
+      <AdBanner slot="2418207987" />
 
       {/* Resources Grid */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
@@ -402,6 +407,7 @@ export default function StudyHub() {
             </div>
           </div>
         </div>
+         <AdBanner slot="7510752562" />
       </section>
 
       {/* Request Section */}
