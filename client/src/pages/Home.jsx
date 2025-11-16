@@ -1,29 +1,28 @@
-import AdBanner from "../components/AdBanner"
 import resumee from "../component/resumee.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
+import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from 'lucide-react'
 import { blogAPI, studyAPI, projectAPI } from "../services/api"
 import * as LucideIcons from "lucide-react"
 
 const DynamicLucideIcon = ({ name, ...props }) => {
   const IconComponent = LucideIcons[name]
   if (!IconComponent) {
-    return <LucideIcons.FileText {...props} />
+    return <LucideIcons.FileText {...props} /> 
   }
   return <IconComponent {...props} />
 }
 
 // Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  const texts = ["Full-Stack Developer","Software Developer","Blockchain Enthusiast","Problem Solver", "Innovation Builder", "Lifelong Learner"]
+  const texts = ["Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Innovation Builder"]
 
   const [recentProjects, setRecentProjects] = useState([])
   const [recentStudyResources, setRecentStudyResources] = useState([])
@@ -47,48 +46,19 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        setError(null) // Reset error state on retry
-
-        const [projectsRes, studyRes, blogsRes] = await Promise.allSettled([
+        const [projectsRes, studyRes, blogsRes] = await Promise.all([
           projectAPI.getProjects(),
           studyAPI.getResources(),
           blogAPI.getBlogs(),
         ])
 
-        if (projectsRes.status === "fulfilled") {
-          setRecentProjects(
-            projectsRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3),
-          )
-        } else {
-          console.error("Failed to fetch projects:", projectsRes.reason)
-          setRecentProjects([]) // Use empty array as fallback
-        }
-
-        if (studyRes.status === "fulfilled") {
-          setRecentStudyResources(
-            studyRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3),
-          )
-        } else {
-          console.error("Failed to fetch study resources:", studyRes.reason)
-          setRecentStudyResources([]) // Use empty array as fallback
-        }
-
-        if (blogsRes.status === "fulfilled") {
-          setRecentBlogs(blogsRes.value.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
-        } else {
-          console.error("Failed to fetch blogs:", blogsRes.reason)
-          setRecentBlogs([]) // Use empty array as fallback
-        }
-
-        if (projectsRes.status === "rejected" && studyRes.status === "rejected" && blogsRes.status === "rejected") {
-          setError("Unable to connect to server. Please check your internet connection or try again later.")
-        }
+        // Sort by creation date (assuming 'createdAt' field exists) and take top 3
+        setRecentProjects(projectsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
+        setRecentStudyResources(studyRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
+        setRecentBlogs(blogsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
       } catch (err) {
-        console.error("Unexpected error during data fetch:", err)
-        setError("An unexpected error occurred. Please refresh the page.")
-        setRecentProjects([])
-        setRecentStudyResources([])
-        setRecentBlogs([])
+        console.error("Failed to fetch recent data:", err)
+        setError("Failed to load recent content.")
       } finally {
         setLoading(false)
       }
@@ -132,35 +102,27 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="pt-16 min-h-screen">
-        {/* Hero Section with loading state */}
-        <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="animate-pulse">
-              <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
-              <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-8 max-w-md mx-auto"></div>
-              <div className="flex justify-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div className="pt-16 min-h-screen flex items-center justify-center px-4">
+        <div className="text-center">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-200 dark:text-gray-700 mb-4">
+            Welcome to My Portfolio
+          </h1>
+          <p className="text-xl text-gray-500 dark:text-gray-400">Loading amazing content...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="pt-16 min-h-screen flex items-center justify-center">
+        <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
       </div>
     )
   }
 
   return (
     <div className="pt-16">
-      {error && (
-        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-400 p-4 mb-4">
-          <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-red-700 dark:text-red-400">{error} Some content may not be available.</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -179,7 +141,8 @@ export default function Home() {
               </div>
 
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
-                I love turning ideas into reality through code. I’m passionate about innovation and problem-solving, building real-world solutions with clean design and scalable development from React to Web3.
+                I build ideas, believe in innovation, and love to create real-world projects. From React to Web3 —
+                crafting clean, scalable code that makes a difference.
               </p>
 
               {/* CTA Buttons */}
@@ -227,9 +190,6 @@ export default function Home() {
                 >
                   <Github className="text-gray-800 dark:text-white" size={24} />
                 </a>
-
-
-
                 <a
                   href="mailto:bjbestintheworld@gmail.com"
                   className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow"
@@ -457,10 +417,6 @@ export default function Home() {
       {/* Recent Study Hub Teaser */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
-
-          <AdBanner slot="1527249400" />
-
-
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Recent Study Resources

@@ -1,5 +1,3 @@
-import AdBanner from "../components/AdBanner"
-
 import { useState, useEffect } from "react"
 import { Calendar, Clock, Eye, Tag, ArrowRight, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
@@ -153,12 +151,6 @@ export default function Blog() {
               </Link>
             </div>
           )}
-
-
-          <AdBanner slot="9097783517" />
-
-
-
         </div>
       </section>
 
