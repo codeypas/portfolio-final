@@ -12,8 +12,7 @@ export default function Footer() {
           <div className="md:col-span-2">
             <img src={logo} alt="" width={120} />
             <p className="text-gray-300 mb-6 max-w-md">
-              Full-Stack Developer passionate about building innovative web solutions and sharing knowledge through code
-              and content.
+              Full-Stack Software Developer who enjoys building real-world web and software solutions, and sharing what I learn through code and content.
             </p>
 
             {/* Social Links */}

@@ -14,15 +14,12 @@ const DynamicLucideIcon = ({ name, ...props }) => {
   return <IconComponent {...props} />
 }
 
-// Define the base URL for uploaded files
 const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
-
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
   const [currentIndex, setCurrentIndex] = useState(0)
-  const texts = ["Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Innovation Builder"]
+  const texts = ["Software Developer", "Full-Stack Developer", "Blockchain Enthusiast", "Problem Solver", "Cloud Learner", "Innovation Builder", "AI & ML Enthusiast"]
 
   const [recentProjects, setRecentProjects] = useState([])
   const [recentStudyResources, setRecentStudyResources] = useState([])
@@ -52,7 +49,6 @@ export default function Home() {
           blogAPI.getBlogs(),
         ])
 
-        // Sort by creation date (assuming 'createdAt' field exists) and take top 3
         setRecentProjects(projectsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
         setRecentStudyResources(studyRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
         setRecentBlogs(blogsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
@@ -107,7 +103,9 @@ export default function Home() {
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-200 dark:text-gray-700 mb-4">
             Welcome to My Portfolio
           </h1>
-          <p className="text-xl text-gray-500 dark:text-gray-400">Loading amazing content...</p>
+          <p className="text-xl text-gray-500 dark:text-gray-400">Please wait... 
+            <br />
+            Loading something amazing...</p>
         </div>
       </div>
     )
@@ -141,11 +139,9 @@ export default function Home() {
               </div>
 
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl">
-                I build ideas, believe in innovation, and love to create real-world projects. From React to Web3 —
-                crafting clean, scalable code that makes a difference.
+                I build ideas, believe in innovation, and love creating real-world software projects. From React to Web3, I focus on writing clean, scalable code that actually makes a difference.
               </p>
 
-              {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
                 <a
                   href={resumee}
