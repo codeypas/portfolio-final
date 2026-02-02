@@ -1,6 +1,6 @@
 import AdBanner from "../components/AdBanner"
 import { useState } from "react"
-import resumee from "../component/resumee.pdf"
+import resumee from "../component/resume.pdf"
 import {
   Mail,
   MapPin,
