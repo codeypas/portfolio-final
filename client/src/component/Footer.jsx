@@ -1,4 +1,4 @@
-import resumee from "../component/resumee.pdf"
+import resumee from "../component/resume.pdf"
 import logo from "../image/BIZZBIO.png"
 import { Link } from "react-router-dom"
 import { Github, Linkedin, Mail, Download, Heart } from "lucide-react"

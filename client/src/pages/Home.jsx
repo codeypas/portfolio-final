@@ -1,4 +1,4 @@
-import resumee from "../component/resumee.pdf"
+import resumee from "../component/resume.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
