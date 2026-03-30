@@ -1,6 +1,7 @@
 const DEFAULT_API_ORIGIN = "https://portfolio-backend-ohp9.onrender.com"
 
-const trimTrailingSlash = (value = "") => value.replace(/\/+$/, "")
+const sanitizeEnvValue = (value = "") => String(value).trim().replace(/^['"]|['"]$/g, "")
+const trimTrailingSlash = (value = "") => sanitizeEnvValue(value).replace(/\/+$/, "")
 
 const withApiSuffix = (value) => {
   const normalized = trimTrailingSlash(value)

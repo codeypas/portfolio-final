@@ -31,10 +31,19 @@ const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const normalizeOrigin = (value = "") => String(value).trim().replace(/^['"]|['"]$/g, "").replace(/\/$/, "")
+
 const parseOrigins = () => {
   const origins = ["http://localhost:5173"]
-  if (process.env.FRONTEND_ORIGIN) {
-    const envOrigins = process.env.FRONTEND_ORIGIN.split(",").map((o) => o.trim().replace(/\/$/, ""))
+  const rawOrigins =
+    process.env.FRONTEND_ORIGIN || process.env.CORS_ORIGIN || process.env.CLIENT_URL || process.env.FRONTEND_URL || ""
+
+  if (rawOrigins) {
+    const envOrigins = rawOrigins
+      .split(",")
+      .map(normalizeOrigin)
+      .filter(Boolean)
+
     origins.push(...envOrigins)
   }
   return origins
@@ -43,14 +52,30 @@ const parseOrigins = () => {
 const allowedOrigins = parseOrigins()
 console.log("[v0] Allowed CORS origins:", allowedOrigins)
 
+const isAllowedOrigin = (origin) => {
+  const normalizedOrigin = normalizeOrigin(origin)
+
+  return allowedOrigins.some((allowedOrigin) => {
+    if (allowedOrigin === "*") {
+      return true
+    }
+
+    if (allowedOrigin.includes("*")) {
+      const pattern = new RegExp(`^${allowedOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, ".*")}$`)
+      return pattern.test(normalizedOrigin)
+    }
+
+    return allowedOrigin === normalizedOrigin
+  })
+}
+
 app.use(express.json())
 app.use(cookieParser())
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      const normalizedOrigin = origin ? origin.replace(/\/$/, "") : origin
-      if (!normalizedOrigin || allowedOrigins.includes(normalizedOrigin)) {
+      if (!origin || isAllowedOrigin(origin)) {
         callback(null, true)
       } else {
         console.warn(`[v0] CORS blocked origin: ${origin}`)
