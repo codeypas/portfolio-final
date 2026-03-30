@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { X, AlertTriangle } from "lucide-react"
+import { API_BASE_URL } from "../config/api"
 
 export default function ColdStartAlert() {
   const [isVisible, setIsVisible] = useState(false)
@@ -13,8 +14,7 @@ export default function ColdStartAlert() {
       setTimeout(() => {
         const checkBackendHealth = async () => {
           try {
-            const apiBase = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/+$/, "")
-            const healthUrl = `${apiBase}/health`
+            const healthUrl = `${API_BASE_URL}/health`
 
             console.log("[v0] ColdStartAlert: Checking health endpoint:", healthUrl)
 

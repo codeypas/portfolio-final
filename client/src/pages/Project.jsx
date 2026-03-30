@@ -3,9 +3,7 @@ import { Github, ExternalLink, Calendar, Eye, Star, Plus, ArrowRight } from "luc
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { projectAPI } from "../services/api"
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -205,7 +203,12 @@ export default function Project() {
         setProjects(sortedProjects || [])
       } catch (err) {
         console.error("Failed to fetch projects:", err)
-        setProjects([]) // Use sample data as fallback
+        setProjects([])
+        setError(
+          isTimeoutError(err)
+            ? "The project service is taking longer than expected. Showing sample projects for now."
+            : "Unable to load live projects right now. Showing sample projects instead."
+        )
         console.warn("Using sample project data due to API failure")
       } finally {
         setLoading(false)

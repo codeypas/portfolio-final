@@ -4,9 +4,7 @@ import { useNavigate, Link } from "react-router-dom"
 import { Plus, Edit, Trash2, Star, FileText, BookOpen, FolderOpen, Mail, CheckCircle } from "lucide-react" // Added CheckCircle
 import { blogAPI, contactAPI, studyAPI, projectAPI } from "../services/api"
 import * as LucideIcons from "lucide-react" // Import all Lucide icons
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+import { UPLOAD_BASE_URL } from "../config/api"
 
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;

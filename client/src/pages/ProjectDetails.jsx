@@ -4,9 +4,7 @@ import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { projectAPI } from "../services/api"
 import { Calendar, Eye, Star, Github, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+import { UPLOAD_BASE_URL } from "../config/api"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 

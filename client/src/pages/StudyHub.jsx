@@ -4,9 +4,7 @@ import { Download, Eye, Calendar, Heart, Search, FileText, Video, Code, BookOpen
 import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { studyAPI } from "../services/api"
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
+import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
 
 export default function StudyHub() {
   const [selectedCategory, setSelectedCategory] = useState("All")
@@ -158,14 +156,18 @@ export default function StudyHub() {
     const fetchStudyResources = async () => {
       try {
         setLoading(true)
+        setError(null)
         const response = await studyAPI.getResources()
         setStudyResources(response.data)
       } catch (err) {
         if (err.response?.status !== 401) {
           console.error("Failed to fetch study resources:", err)
-          setError("Failed to load study resources. Please try again later.")
+          setError(
+            isTimeoutError(err)
+              ? "The study resource service is taking longer than expected. Showing sample resources for now."
+              : "Unable to load live study resources right now. Showing sample resources instead."
+          )
         }
-        // Use sample resources as fallback for non-logged-in users
         setStudyResources([])
       } finally {
         setLoading(false)
@@ -230,16 +232,14 @@ export default function StudyHub() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="pt-16 min-h-screen">
+      {error && (
+        <div className="mx-4 mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+          {error}
+        </div>
+      )}
+
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-green-50 to-blue-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto text-center">

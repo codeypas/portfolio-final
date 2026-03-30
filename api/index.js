@@ -13,8 +13,12 @@ import { fileURLToPath } from "url"
 
 dotenv.config()
 
+mongoose.set("bufferCommands", false)
+
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 10000,
+  })
   .then(() => {
     console.log("database is connected")
   })
@@ -77,7 +81,16 @@ app.get("/test", (req, res) => {
 })
 
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", message: "Backend is healthy" })
+  const isDatabaseConnected = mongoose.connection.readyState === 1
+
+  res.status(isDatabaseConnected ? 200 : 503).json({
+    status: isDatabaseConnected ? "ok" : "degraded",
+    message: isDatabaseConnected ? "Backend and database are healthy" : "Backend is running but database is not connected",
+    database: {
+      connected: isDatabaseConnected,
+      readyState: mongoose.connection.readyState,
+    },
+  })
 })
 
 app.use("/api/auth", authRoutes)

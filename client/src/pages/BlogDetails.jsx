@@ -2,9 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react"
 import { useParams, Link } from "react-router-dom"
 import { blogAPI } from "../services/api"
 import { Calendar, Clock, Eye, Tag, ArrowLeft } from "lucide-react"
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+import { UPLOAD_BASE_URL } from "../config/api"
 
 export default function BlogDetails() {
   const { id } = useParams()

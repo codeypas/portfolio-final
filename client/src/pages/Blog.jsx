@@ -3,9 +3,7 @@ import { Calendar, Clock, Eye, Tag, ArrowRight, Plus } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { blogAPI } from "../services/api"
-
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
 
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("All")
@@ -96,12 +94,17 @@ export default function Blog() {
     const fetchBlogs = async () => {
       try {
         setLoading(true)
+        setError(null)
         const response = await blogAPI.getBlogs()
         setBlogPosts(response.data)
       } catch (err) {
         console.error("Failed to fetch blogs:", err)
-        setError("Failed to load blogs. Please try again later.")
-        setBlogPosts([]) // Clear posts on error
+        setError(
+          isTimeoutError(err)
+            ? "The blog service is taking longer than expected. Showing sample posts for now."
+            : "Unable to load live blog posts right now. Showing sample posts instead."
+        )
+        setBlogPosts([])
       } finally {
         setLoading(false)
       }
@@ -123,16 +126,14 @@ export default function Blog() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-red-500 text-lg">{error}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="pt-16 min-h-screen">
+      {error && (
+        <div className="mx-4 mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+          {error}
+        </div>
+      )}
+
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-7xl mx-auto text-center">

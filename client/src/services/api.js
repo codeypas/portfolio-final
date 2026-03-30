@@ -1,21 +1,30 @@
 import axios from "axios"
-
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:3000/api").replace(/\/+$/, "")
+import { API_BASE_URL, API_TIMEOUT_MS, isAuthError } from "../config/api"
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: API_TIMEOUT_MS,
   withCredentials: true,
 })
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.code === "ECONNREFUSED" || error.code === "ERR_NETWORK") {
       console.error("Backend server is not running or unreachable. Please start the server.")
     }
-    if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      console.error("Authentication or Authorization error:", error.response.data.message)
+
+    if (isAuthError(error)) {
+      if (!error.config?.meta?.silentAuthFailure) {
+        console.warn("Authentication or authorization error:", error.response?.data?.message || error.message)
+      }
+      return Promise.reject(error)
     }
+
+    if (error.code === "ECONNABORTED") {
+      console.error(`Request timed out after ${API_TIMEOUT_MS}ms:`, error.config?.url)
+    }
+
     return Promise.reject(error)
   },
 )
@@ -24,7 +33,12 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => api.post("/auth/signin", credentials),
   register: (userData) => api.post("/auth/signup", userData),
-  getProfile: () => api.get("/auth/profile"),
+  getProfile: (options = {}) =>
+    api.get("/auth/profile", {
+      meta: {
+        silentAuthFailure: options.silentAuthFailure ?? false,
+      },
+    }),
   logout: () => api.post("/auth/signout"),
 }
 

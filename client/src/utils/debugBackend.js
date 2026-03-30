@@ -1,5 +1,6 @@
+import { API_BASE_URL } from "../config/api"
+
 export const debugBackend = async () => {
-  const API_BASE_URL = import.meta.env.VITE_API_URL || "https://mybio-backend.onrender.com/api"
   const results = {
     baseUrl: API_BASE_URL,
     tests: [],

@@ -2,9 +2,10 @@ import resumee from "../component/resume.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from 'lucide-react'
+import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
 import { blogAPI, studyAPI, projectAPI } from "../services/api"
 import * as LucideIcons from "lucide-react"
+import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
 
 const DynamicLucideIcon = ({ name, ...props }) => {
   const IconComponent = LucideIcons[name]
@@ -13,8 +14,6 @@ const DynamicLucideIcon = ({ name, ...props }) => {
   }
   return <IconComponent {...props} />
 }
-
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "http://localhost:3000"
 
 export default function Home() {
   const [currentText, setCurrentText] = useState("")
@@ -26,6 +25,7 @@ export default function Home() {
   const [recentBlogs, setRecentBlogs] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const sortRecentItems = (items) => [...items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -43,18 +43,54 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        const [projectsRes, studyRes, blogsRes] = await Promise.all([
+        setError(null)
+
+        const results = await Promise.allSettled([
           projectAPI.getProjects(),
           studyAPI.getResources(),
           blogAPI.getBlogs(),
         ])
 
-        setRecentProjects(projectsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
-        setRecentStudyResources(studyRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
-        setRecentBlogs(blogsRes.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 3))
+        const [projectsRes, studyRes, blogsRes] = results
+        const failedSections = []
+
+        if (projectsRes.status === "fulfilled") {
+          setRecentProjects(sortRecentItems(projectsRes.value.data))
+        } else {
+          failedSections.push("projects")
+          setRecentProjects([])
+          console.error("Failed to fetch recent projects:", projectsRes.reason)
+        }
+
+        if (studyRes.status === "fulfilled") {
+          setRecentStudyResources(sortRecentItems(studyRes.value.data))
+        } else {
+          failedSections.push("study resources")
+          setRecentStudyResources([])
+          console.error("Failed to fetch recent study resources:", studyRes.reason)
+        }
+
+        if (blogsRes.status === "fulfilled") {
+          setRecentBlogs(sortRecentItems(blogsRes.value.data))
+        } else {
+          failedSections.push("blogs")
+          setRecentBlogs([])
+          console.error("Failed to fetch recent blogs:", blogsRes.reason)
+        }
+
+        if (failedSections.length > 0) {
+          setError(
+            isTimeoutError(projectsRes.reason) || isTimeoutError(studyRes.reason) || isTimeoutError(blogsRes.reason)
+              ? "The backend is responding slowly right now, so some recent content could not be loaded."
+              : "Some recent content is temporarily unavailable."
+          )
+        }
       } catch (err) {
         console.error("Failed to fetch recent data:", err)
-        setError("Failed to load recent content.")
+        setRecentProjects([])
+        setRecentStudyResources([])
+        setRecentBlogs([])
+        setError("Recent content is temporarily unavailable.")
       } finally {
         setLoading(false)
       }
@@ -111,16 +147,14 @@ export default function Home() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="pt-16 min-h-screen flex items-center justify-center">
-        <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
-      </div>
-    )
-  }
-
   return (
     <div className="pt-16">
+      {error && (
+        <div className="mx-4 mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+          {error}
+        </div>
+      )}
+
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">

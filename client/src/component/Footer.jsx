@@ -1,5 +1,5 @@
 import resumee from "../component/resume.pdf"
-import logo from "../image/BIZZBiO.png"
+import logo from "../image/BiZZBiO.png"
 import { Link } from "react-router-dom"
 import { Github, Linkedin, Mail, Download, Heart } from "lucide-react"
 

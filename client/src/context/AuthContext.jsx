@@ -22,15 +22,13 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      // No need to check localStorage for token, it's httpOnly cookie
-      const response = await authAPI.getProfile() // This call will send the httpOnly cookie
+      const response = await authAPI.getProfile({ silentAuthFailure: true })
       setUser(response.data.user)
     } catch (error) {
-      // Only log if it's not a 401 (unauthorized) error
       if (error.response?.status !== 401) {
         console.error("Auth check failed:", error.message)
       }
-      setUser(null) // Ensure user is null if auth fails
+      setUser(null)
     } finally {
       setLoading(false)
     }
@@ -40,8 +38,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null)
       const response = await authAPI.login(credentials)
-      // Token is set as httpOnly cookie by backend, so we only get user data here
-      setUser(response.data.user) // Now expects { user: ... }
+      setUser(response.data.user)
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.message || "Login failed. Please check if the server is running."
@@ -54,8 +51,7 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null)
       const response = await authAPI.register(userData)
-      // Token is set as httpOnly cookie by backend, so we only get user data here
-      setUser(response.data.user) // Now expects { user: ... }
+      setUser(response.data.user)
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.message || "Registration failed. Please check if the server is running."
@@ -66,11 +62,11 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await authAPI.logout() // Call the backend logout endpoint to clear the cookie
+      await authAPI.logout()
     } catch (err) {
       console.error("Error during logout:", err)
     } finally {
-      setUser(null) // Clear frontend user state regardless of backend logout success
+      setUser(null)
     }
   }
 
