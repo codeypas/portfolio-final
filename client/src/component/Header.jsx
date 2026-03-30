@@ -1,5 +1,5 @@
 "use client"
-import logo from "../image/BIZZBIO.png"
+import logo from "../image/BiZZBiO.png"
 import { useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom" // Import useNavigate
 import { Menu, X, Sun, Moon, LogIn, LogOut, LayoutDashboard } from "lucide-react" // Import new icons
