@@ -15,6 +15,7 @@ export default function Footer() {
               Full-Stack Software Developer who enjoys building real-world web and software solutions, and sharing what I learn through code and content.
             </p>
 
+            
             {/* Social Links */}
             <div className="flex space-x-4">
               <a
