@@ -1,5 +1,5 @@
 import resumee from "../component/resume.pdf"
-import logo from "../image/BIZZBIO.png"
+import logo from "../image/BIZZBiO.png"
 import { Link } from "react-router-dom"
 import { Github, Linkedin, Mail, Download, Heart } from "lucide-react"
 
@@ -15,7 +15,7 @@ export default function Footer() {
               Full-Stack Software Developer who enjoys building real-world web and software solutions, and sharing what I learn through code and content.
             </p>
 
-            
+
             {/* Social Links */}
             <div className="flex space-x-4">
               <a
