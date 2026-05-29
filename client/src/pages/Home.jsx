@@ -2,8 +2,17 @@ import resumee from "../component/resume.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
+<<<<<<< HEAD
 import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
+=======
+<<<<<<< HEAD
+import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from 'lucide-react'
+=======
+import { Download, ExternalLink, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
+>>>>>>> 8cab518 (update)
+>>>>>>> 1a001ce (frontend transfer to render)
 import { blogAPI, studyAPI, projectAPI } from "../services/api"
+import { GitHub, Linkedin } from "../component/BrandIcons"
 import * as LucideIcons from "lucide-react"
 import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
 
@@ -218,7 +227,7 @@ export default function Home() {
                   className="p-3 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow"
                   rel="noreferrer"
                 >
-                  <Github className="text-gray-800 dark:text-white" size={24} />
+                  <GitHub className="text-gray-800 dark:text-white" size={24} />
                 </a>
                 <a
                   href="mailto:bjbestintheworld@gmail.com"
@@ -341,7 +350,7 @@ export default function Home() {
                           className="flex items-center px-4 py-2 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 transition-colors text-sm"
                           rel="noreferrer"
                         >
-                          <Github className="mr-2" size={16} />
+                          <GitHub className="mr-2" size={16} />
                           Code
                         </a>
                       )}
@@ -557,7 +566,7 @@ export default function Home() {
               className="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors"
               rel="noreferrer"
             >
-              <Github size={32} />
+              <GitHub size={32} />
             </a>
             <a
               href="mailto:bjbestintheworld@gmail.com"

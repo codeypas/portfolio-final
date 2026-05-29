@@ -1,7 +1,8 @@
 import resumee from "../component/resume.pdf"
 import logo from "../image/BiZZBiO.png"
 import { Link } from "react-router-dom"
-import { Github, Linkedin, Mail, Download, Heart } from "lucide-react"
+import { Mail, Download, Heart } from "lucide-react"
+import { GitHub, Linkedin } from "./BrandIcons"
 
 export default function Footer() {
   return (
@@ -34,7 +35,7 @@ export default function Footer() {
                 className="p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors"
                 aria-label="GitHub"
               >
-                <Github size={20} />
+                <GitHub size={20} />
               </a>
               <a
                 href="mailto:bjbestintheworld@gmail.com"

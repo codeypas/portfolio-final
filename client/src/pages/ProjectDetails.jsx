@@ -3,8 +3,16 @@ import AdBanner from "../components/AdBanner"
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { projectAPI } from "../services/api"
+<<<<<<< HEAD
 import { Calendar, Eye, Star, Github, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
 import { UPLOAD_BASE_URL } from "../config/api"
+=======
+import { Calendar, Eye, Star, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
+import { GitHub } from "../component/BrandIcons"
+
+// Define the base URL for uploaded files
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+>>>>>>> 1a001ce (frontend transfer to render)
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -179,7 +187,7 @@ export default function ProjectDetails() {
               rel="noopener noreferrer"
               className="inline-flex items-center px-6 py-3 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors font-semibold"
             >
-              <Github className="mr-2" size={20} />
+              <GitHub className="mr-2" size={20} />
               GitHub Repository
             </a>
           )}

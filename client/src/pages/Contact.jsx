@@ -7,12 +7,11 @@ import {
   Send,
   CheckCircle,
   AlertCircle,
-  Linkedin,
-  Github,
   Download,
   ChevronDown,
   ChevronUp,
 } from "lucide-react"
+import { GitHub, Linkedin } from "../component/BrandIcons"
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -257,7 +256,7 @@ export default function Contact() {
                   className="flex items-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow group"
                 >
                   <div className="p-3 bg-gray-100 dark:bg-gray-700 rounded-lg mr-4">
-                    <Github className="text-gray-800 dark:text-white" size={24} />
+                    <GitHub className="text-gray-800 dark:text-white" size={24} />
                   </div>
                   <div>
                     <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">

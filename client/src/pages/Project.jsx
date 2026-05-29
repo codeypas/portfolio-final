@@ -1,9 +1,16 @@
 import { useState, useEffect } from "react"
-import { Github, ExternalLink, Calendar, Eye, Star, Plus, ArrowRight } from "lucide-react"
+import { ExternalLink, Calendar, Eye, Star, Plus, ArrowRight } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { projectAPI } from "../services/api"
+<<<<<<< HEAD
 import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
+=======
+import { GitHub } from "../component/BrandIcons"
+
+// Define the base URL for uploaded files
+const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
+>>>>>>> 1a001ce (frontend transfer to render)
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
@@ -401,7 +408,7 @@ export default function Project() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm font-medium"
                       >
-                        <Github className="mr-2" size={16} />
+                        <GitHub className="mr-2" size={16} />
                         GitHub
                       </a>
                     )}
@@ -456,7 +463,7 @@ export default function Project() {
             rel="noopener noreferrer"
             className="inline-flex items-center px-6 py-3 bg-gray-800 dark:bg-gray-700 text-white rounded-lg hover:bg-gray-900 dark:hover:bg-gray-600 transition-colors font-semibold"
           >
-            <Github className="mr-2" size={20} />
+            <GitHub className="mr-2" size={20} />
             View GitHub Profile
           </a>
         </div>
