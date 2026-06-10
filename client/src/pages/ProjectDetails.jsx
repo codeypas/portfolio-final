@@ -3,18 +3,13 @@ import AdBanner from "../components/AdBanner"
 import { useState, useEffect } from "react"
 import { useParams, Link } from "react-router-dom"
 import { projectAPI } from "../services/api"
-<<<<<<< HEAD
 import { Calendar, Eye, Star, Github, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
 import { UPLOAD_BASE_URL } from "../config/api"
-=======
-import { Calendar, Eye, Star, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
+// import { Calendar, Eye, Star, ExternalLink, ArrowLeft, CheckCircle } from "lucide-react"
 import { GitHub } from "../component/BrandIcons"
 
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
->>>>>>> 1a001ce (frontend transfer to render)
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
-// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
 export default function ProjectDetails() {
   const { id } = useParams()

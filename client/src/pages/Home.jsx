@@ -2,15 +2,7 @@ import resumee from "../component/resume.pdf"
 import ppsize from "./ppsize.jpg"
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-<<<<<<< HEAD
-import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
-=======
-<<<<<<< HEAD
-import { Download, ExternalLink, Github, Linkedin, Mail, ArrowRight, Code, Database, Globe, Wrench } from 'lucide-react'
-=======
 import { Download, ExternalLink, Mail, ArrowRight, Code, Database, Globe, Wrench } from "lucide-react"
->>>>>>> 8cab518 (update)
->>>>>>> 1a001ce (frontend transfer to render)
 import { blogAPI, studyAPI, projectAPI } from "../services/api"
 import { GitHub, Linkedin } from "../component/BrandIcons"
 import * as LucideIcons from "lucide-react"

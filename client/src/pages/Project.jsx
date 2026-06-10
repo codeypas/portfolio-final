@@ -3,14 +3,10 @@ import { ExternalLink, Calendar, Eye, Star, Plus, ArrowRight } from "lucide-reac
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "../context/AuthContext"
 import { projectAPI } from "../services/api"
-<<<<<<< HEAD
 import { UPLOAD_BASE_URL, isTimeoutError } from "../config/api"
-=======
 import { GitHub } from "../component/BrandIcons"
 
-// Define the base URL for uploaded files
-const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
->>>>>>> 1a001ce (frontend transfer to render)
+// const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL || "https://portfolio-backend-ohp9.onrender.com"
 
 // const UPLOAD_BASE_URL = import.meta.env.VITE_UPLOAD_BASE_URL;
 
