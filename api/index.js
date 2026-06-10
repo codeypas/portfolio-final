@@ -34,7 +34,8 @@ const __dirname = path.dirname(__filename)
 const normalizeOrigin = (value = "") => String(value).trim().replace(/^['"]|['"]$/g, "").replace(/\/$/, "")
 
 const parseOrigins = () => {
-  const origins = ["http://localhost:5173"]
+  // const origins = ["http://localhost:5173"]
+  const origins = ["https://portfolio-final-p9fi.onrender.com", "https://portfolio-backend-ohp9.onrender.com"]
   const rawOrigins =
     process.env.FRONTEND_ORIGIN || process.env.CORS_ORIGIN || process.env.CLIENT_URL || process.env.FRONTEND_URL || ""
 
