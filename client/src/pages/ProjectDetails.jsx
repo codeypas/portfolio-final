@@ -93,6 +93,10 @@ export default function ProjectDetails() {
               <img
                 src={project.image.startsWith("/uploads/") ? `${UPLOAD_BASE_URL}${project.image}` : project.image}
                 alt={project.title}
+                onError={(event) => {
+                  event.currentTarget.onerror = null
+                  event.currentTarget.src = "/placeholder.svg"
+                }}
                 className="w-full h-full object-contain transition-transform duration-500 ease-in-out hover:scale-105"
               />
             </div>

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    runtime: static
+    name: portfolio-final-p9fi
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

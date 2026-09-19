@@ -200,9 +200,10 @@ export default function Blog() {
                       <img
                         src={thumbnailUrl || "/placeholder.svg"}
                         alt={post.title}
-                        onError={(e) => {
+                        onError={(event) => {
                           console.log("[v0] Image failed to load, using fallback:", thumbnailUrl)
-                          e.target.src = "/placeholder.svg?height=200&width=300&text=Blog+Post"
+                          event.currentTarget.onerror = null
+                          event.currentTarget.src = "/placeholder.svg"
                         }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"

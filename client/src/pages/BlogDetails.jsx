@@ -140,8 +140,9 @@ export default function BlogDetails() {
               <img
                 src={thumbnailUrl || "/placeholder.svg"}
                 alt={blog?.title}
-                onError={(e) => {
-                  e.target.src = "/placeholder.svg?height=200&width=300&text=Blog+Post"
+                onError={(event) => {
+                  event.currentTarget.onerror = null
+                  event.currentTarget.src = "/placeholder.svg"
                 }}
                 className="max-h-full max-w-full object-contain transition-transform duration-500 ease-in-out group-hover:scale-105"
               />

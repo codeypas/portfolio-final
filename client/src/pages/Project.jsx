@@ -319,6 +319,10 @@ export default function Project() {
                           : project.image || "/placeholder.svg"
                       }
                       alt={project.title}
+                      onError={(event) => {
+                        event.currentTarget.onerror = null
+                        event.currentTarget.src = "/placeholder.svg"
+                      }}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
