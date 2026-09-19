@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom"
 import { ThemeProvider } from "./context/ThemeContext"
 import { AuthProvider } from "./context/AuthContext"
 import Home from "./pages/Home"
@@ -33,6 +33,7 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/blog" element={<Blog />} />
+              <Route path="/blogs" element={<Navigate to="/blog" replace />} />
               <Route path="/blog/:id" element={<BlogDetails />} />
               {/* Protect StudyHub with AuthContext-aware guard */}
               <Route
@@ -44,6 +45,7 @@ export default function App() {
                 }
               />
               <Route path="/project" element={<Project />} />
+              <Route path="/projects" element={<Navigate to="/project" replace />} />
               <Route path="/project/:id" element={<ProjectDetails />} /> {/* New route for project details */}
               <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />

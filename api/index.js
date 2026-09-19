@@ -88,7 +88,9 @@ app.use(
 )
 
 app.use((req, res, next) => {
-  console.log(`[v0] ${req.method} ${req.path} - Cookies received:`, req.cookies)
+  if (process.env.NODE_ENV !== "production") {
+    console.log(`[v0] ${req.method} ${req.path} - Cookie names:`, Object.keys(req.cookies))
+  }
   next()
 })
 

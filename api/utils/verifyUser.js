@@ -35,21 +35,14 @@ import { errorHandler } from "./error.js"
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.access_token
 
-  console.log("[v0] verifyToken called")
-  console.log("[v0] All cookies:", req.cookies)
-  console.log("[v0] Token from cookies:", token ? "EXISTS" : "MISSING")
-
   if (!token) {
-    console.warn("[v0] No token in cookies. Available cookies:", Object.keys(req.cookies))
     return next(errorHandler(401, "Unauthorized: No token provided"))
   }
 
   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
     if (err) {
-      console.error("[v0] Token verification failed:", err.message)
       return next(errorHandler(403, "Forbidden: Invalid token"))
     }
-    console.log("[v0] Token verified successfully for user:", user.id)
     req.user = user
     next()
   })

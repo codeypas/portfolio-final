@@ -96,22 +96,24 @@ import User from "../models/user.model.js"
 import bcryptjs from "bcryptjs"
 import jwt from "jsonwebtoken"
 
-const setCookie = (res, token) => {
-  const isProduction = process.env.NODE_ENV === "production"
-  console.log("[v0] Setting cookie with options:")
-  console.log("  - httpOnly:", true)
-  console.log("  - secure:", isProduction)
-  console.log("  - sameSite:", isProduction ? "None" : "Lax")
-  console.log("  - maxAge:", 3600000)
+const AUTH_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000
 
-  res.cookie("access_token", token, {
+const getCookieOptions = () => {
+  // Render terminates HTTPS before forwarding requests to Express. RENDER is
+  // set by the platform, so this remains correct even if NODE_ENV is missing.
+  const isProduction = process.env.NODE_ENV === "production" || process.env.RENDER === "true"
+
+  return {
     httpOnly: true,
     secure: isProduction,
-    sameSite: isProduction ? "None" : "Lax",
-    maxAge: 3600000,
-  })
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    maxAge: AUTH_COOKIE_MAX_AGE_MS,
+  }
+}
 
-  console.log("[v0] Cookie Set-Cookie header:", res.getHeader("set-cookie"))
+const setCookie = (res, token) => {
+  res.cookie("access_token", token, getCookieOptions())
 }
 
 export const signup = async (req, res, next) => {
@@ -132,7 +134,7 @@ export const signup = async (req, res, next) => {
   try {
     await newUser.save()
     const { password: hashedPasswordFromDoc, ...rest } = newUser._doc
-    const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET)
+    const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
     setCookie(res, token)
     res.status(201).json({ user: rest })
   } catch (error) {
@@ -158,12 +160,10 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(400, "Invalid password"))
     }
 
-    const token = jwt.sign({ id: validUser._id, role: validUser.role }, process.env.JWT_SECRET)
+    const token = jwt.sign({ id: validUser._id, role: validUser.role }, process.env.JWT_SECRET, { expiresIn: "7d" })
 
     const { password: hashedPassword, ...rest } = validUser._doc
-    console.log("[v0] User signin - About to set cookie for user:", validUser.email)
     setCookie(res, token)
-    console.log("[v0] User signin complete - Cookie should be set")
     res.status(200).json({ user: rest })
   } catch (error) {
     console.error("Signin error:", error)
@@ -185,7 +185,8 @@ export const getUserProfile = async (req, res, next) => {
 
 export const signout = (req, res, next) => {
   try {
-    res.clearCookie("access_token")
+    const { maxAge, ...clearCookieOptions } = getCookieOptions()
+    res.clearCookie("access_token", clearCookieOptions)
     res.status(200).json("Signout successful")
   } catch (error) {
     next(errorHandler(500, "Failed to sign out"))
