@@ -4,6 +4,37 @@ import { useEffect, useRef } from "react"
 const SCRIPT_ID = "google-identity-services"
 const SCRIPT_URL = "https://accounts.google.com/gsi/client"
 
+// Google Identity Services is a page-wide singleton. Keeping the latest React
+// callback here lets the component rerender without repeatedly initializing
+// the singleton (which produces the GSI_LOGGER warning).
+let initializedClientId = null
+let credentialHandler = null
+let scriptPromise = null
+
+const loadGoogleIdentityScript = () => {
+  if (window.google?.accounts?.id) return Promise.resolve()
+  if (scriptPromise) return scriptPromise
+
+  scriptPromise = new Promise((resolve, reject) => {
+    const existingScript = document.getElementById(SCRIPT_ID)
+    if (existingScript) {
+      existingScript.addEventListener("load", resolve, { once: true })
+      existingScript.addEventListener("error", reject, { once: true })
+      return
+    }
+
+    const script = document.createElement("script")
+    script.id = SCRIPT_ID
+    script.src = SCRIPT_URL
+    script.async = true
+    script.defer = true
+    script.onload = resolve
+    script.onerror = reject
+    document.head.appendChild(script)
+  })
+  return scriptPromise
+}
+
 export default function GoogleAuthButton({ onCredential, disabled = false }) {
   const buttonRef = useRef(null)
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -12,9 +43,16 @@ export default function GoogleAuthButton({ onCredential, disabled = false }) {
     if (!clientId || disabled) return undefined
 
     let cancelled = false
+    credentialHandler = onCredential
     const renderButton = () => {
       if (cancelled || !buttonRef.current || !window.google?.accounts?.id) return
-      window.google.accounts.id.initialize({ client_id: clientId, callback: ({ credential }) => onCredential(credential) })
+      if (initializedClientId !== clientId) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: ({ credential }) => credentialHandler?.(credential),
+        })
+        initializedClientId = clientId
+      }
       buttonRef.current.innerHTML = ""
       window.google.accounts.id.renderButton(buttonRef.current, {
         theme: "outline",
@@ -24,21 +62,13 @@ export default function GoogleAuthButton({ onCredential, disabled = false }) {
       })
     }
 
-    const existingScript = document.getElementById(SCRIPT_ID)
-    if (existingScript) {
-      renderButton()
-    } else {
-      const script = document.createElement("script")
-      script.id = SCRIPT_ID
-      script.src = SCRIPT_URL
-      script.async = true
-      script.defer = true
-      script.onload = renderButton
-      document.head.appendChild(script)
-    }
+    loadGoogleIdentityScript().then(renderButton).catch(() => {
+      // The Google button remains unavailable when its external script cannot load.
+    })
 
     return () => {
       cancelled = true
+      if (credentialHandler === onCredential) credentialHandler = null
     }
   }, [clientId, disabled, onCredential])
 
