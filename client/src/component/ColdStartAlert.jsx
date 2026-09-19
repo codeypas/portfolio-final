@@ -1,56 +1,88 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { X, AlertTriangle } from "lucide-react"
-import { API_BASE_URL } from "../config/api"
+import { HEALTHCHECK_URL, API_TIMEOUT_MS } from "../config/api"
+
+const ALERT_DELAY_MS = 2500
+const RETRY_DELAY_MS = 3000
+const DISMISSED_KEY = "coldStartAlertDismissed"
 
 export default function ColdStartAlert() {
   const [isVisible, setIsVisible] = useState(false)
   const [dismissed, setDismissed] = useState(false)
+  const dismissedRef = useRef(false)
+  const hadColdStartRef = useRef(false)
 
   useEffect(() => {
-    // Check if user has already dismissed this alert in this session
-    const alertDismissed = sessionStorage.getItem("coldStartAlertDismissed")
+    if (sessionStorage.getItem(DISMISSED_KEY)) return undefined
 
-    if (!alertDismissed) {
-      setTimeout(() => {
-        const checkBackendHealth = async () => {
-          try {
-            const healthUrl = `${API_BASE_URL}/health`
+    let cancelled = false
+    let controller
+    let retryTimeoutId
 
-            console.log("[v0] ColdStartAlert: Checking health endpoint:", healthUrl)
+    const showAlert = () => {
+      if (!cancelled && !dismissedRef.current) {
+        hadColdStartRef.current = true
+        setIsVisible(true)
+      }
+    }
 
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 8000)
+    // Show helpful feedback quickly, but do not give up before Render has had
+    // enough time to wake the backend.
+    const alertTimeoutId = window.setTimeout(showAlert, ALERT_DELAY_MS)
 
-            const response = await fetch(healthUrl, {
-              method: "GET",
-              signal: controller.signal,
-              credentials: "include",
-            })
+    const checkBackendHealth = async () => {
+      controller = new AbortController()
+      const requestTimeoutId = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS)
 
-            clearTimeout(timeoutId)
+      try {
+        console.log("[v0] ColdStartAlert: Checking health endpoint:", HEALTHCHECK_URL)
+        const response = await fetch(HEALTHCHECK_URL, {
+          method: "GET",
+          signal: controller.signal,
+          credentials: "include",
+        })
 
-            if (response.ok) {
-              console.log("[v0] Backend is healthy, not showing cold start alert")
-              return
-            }
-
-            console.log("[v0] Backend health check failed with status:", response.status)
-            setIsVisible(true)
-          } catch (error) {
-            console.log("[v0] Backend health check failed (expected on cold start):", error.message)
-            setIsVisible(true)
-          }
+        if (!response.ok) {
+          throw new Error(`Health endpoint returned ${response.status}`)
         }
 
-        checkBackendHealth()
-      }, 500) // Wait 500ms for CORS to initialize
+        if (!cancelled) {
+          window.clearTimeout(alertTimeoutId)
+          setIsVisible(false)
+          console.log("[v0] Backend is healthy")
+
+          // Other API calls may have failed while the backend was waking. A
+          // single automatic reload retries them with the now-healthy server.
+          if (hadColdStartRef.current && !dismissedRef.current) {
+            window.location.reload()
+          }
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.log("[v0] Backend is still starting; retrying:", error.message)
+          showAlert()
+          retryTimeoutId = window.setTimeout(checkBackendHealth, RETRY_DELAY_MS)
+        }
+      } finally {
+        window.clearTimeout(requestTimeoutId)
+      }
+    }
+
+    checkBackendHealth()
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(alertTimeoutId)
+      window.clearTimeout(retryTimeoutId)
+      controller?.abort()
     }
   }, [])
 
   const handleDismiss = () => {
+    dismissedRef.current = true
     setDismissed(true)
     setIsVisible(false)
-    sessionStorage.setItem("coldStartAlertDismissed", "true")
+    sessionStorage.setItem(DISMISSED_KEY, "true")
   }
 
   if (!isVisible || dismissed) return null
@@ -63,17 +95,17 @@ export default function ColdStartAlert() {
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Server Starting</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              The backend is hosted on Render's free tier, which puts it to sleep when inactive. Please refresh the page it may take upto 1 minute for the server to start.
+              The backend is waking from Render&apos;s free tier. This page will continue automatically when it is ready, which can take up to a minute.
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-              Thank you for your patience! The server will be ready shortly.
+              Thank you for your patience. You do not need to refresh the page.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => window.location.reload()}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
-                Refresh Now
+                Retry now
               </button>
               <button
                 onClick={handleDismiss}

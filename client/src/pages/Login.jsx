@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Eye, EyeOff, User, Mail, Lock, AlertCircle, CheckCircle } from "lucide-react"
 import { useAuth } from "../context/AuthContext"
+import { HEALTHCHECK_URL } from "../config/api"
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true)
@@ -25,8 +26,7 @@ export default function Login() {
 
   const checkServerStatus = async () => {
     try {
-      const response = await fetch("https://portfolio-backend-ohp9.onrender.com/api/health", {
-        // Changed port to 3000
+      const response = await fetch(HEALTHCHECK_URL, {
         method: "GET",
         mode: "cors",
       })
@@ -39,26 +39,6 @@ export default function Login() {
       setServerStatus("offline")
     }
   }
-
-
-
-//   const checkServerStatus = async () => {
-//   try {
-//     const response = await fetch(`${API_BASE_URL}/health`, {
-//       method: "GET",
-//       mode: "cors",
-//     });
-//     if (response.ok) {
-//       setServerStatus("online");
-//     } else {
-//       setServerStatus("offline");
-//     }
-//   } catch (error) {
-//     setServerStatus("offline");
-//   }
-// };
-
-
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
