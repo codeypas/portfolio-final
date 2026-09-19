@@ -4,19 +4,28 @@ import { sendEmail } from "../utils/mailer.js"
 
 export const createContactMessage = async (req, res, next) => {
   try {
-    const { name, email, message } = req.body
+    const name = req.body.name?.trim()
+    const email = req.body.email?.trim().toLowerCase()
+    const message = req.body.message?.trim()
     if (!name || !email || !message) {
       return next(errorHandler(400, "Name, email, and message are required"))
     }
-    const newContact = await Contact.create({ name, email, message })
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return next(errorHandler(400, "Enter a valid email address"))
+    }
+
     await sendEmail({
       to: process.env.CONTACT_RECIPIENT_EMAIL || "bjbestintheworld17@gmail.com",
       replyTo: email,
       subject: `Portfolio contact message from ${name}`,
       text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
     })
+
+    // Return success only after Gmail/SMTP accepts the message for delivery.
+    const newContact = await Contact.create({ name, email, message })
     res.status(201).json(newContact)
   } catch (error) {
+    console.error("Contact email delivery failed:", error.message)
     next(error.statusCode ? error : errorHandler(500, "Failed to send contact message"))
   }
 }

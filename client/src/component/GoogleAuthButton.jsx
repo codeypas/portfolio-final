@@ -43,7 +43,16 @@ export default function GoogleAuthButton({ onCredential, disabled = false }) {
   }, [clientId, disabled, onCredential])
 
   if (!clientId) {
-    return <p className="text-center text-sm text-gray-500 dark:text-gray-400">Google sign-in is not configured.</p>
+    return (
+      <button
+        type="button"
+        disabled
+        className="w-full py-3 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+        title="Set VITE_GOOGLE_CLIENT_ID in the frontend Render service to enable Google sign-in"
+      >
+        Continue with Google
+      </button>
+    )
   }
 
   return <div ref={buttonRef} className={disabled ? "pointer-events-none opacity-50" : "w-full"} />

@@ -64,7 +64,7 @@ export default function Contact() {
     } catch (error) {
       setSubmitStatus({
         type: "error",
-        message: "Sorry, there was an error sending your message. Please try again.",
+        message: error.response?.data?.message || "Sorry, there was an error sending your message. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -182,7 +182,7 @@ export default function Contact() {
                   ) : (
                     <AlertCircle className="mr-3 flex-shrink-0" size={20} />
                   )}
-                  <span>{submitStatus.message}</span>
+                  <span role="alert">{submitStatus.message}</span>
                 </div>
               )}
 
