@@ -9,25 +9,12 @@ import {
 } from "../controllers/project.controller.js"
 import { verifyToken, verifyAdmin } from "../utils/verifyUser.js"
 import multer from "multer"
-import path from "path"
-import { fileURLToPath } from "url"
+import { imageUploadOptions } from "../utils/mediaStorage.js"
 
 const router = express.Router()
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Configure multer for project image uploads
-const projectStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads/projects")) // Store in api/uploads/projects
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname) // Unique filename
-  },
-})
-
-const uploadProjectImage = multer({ storage: projectStorage })
+// Image bytes are stored in MongoDB GridFS, not the temporary Render disk.
+const uploadProjectImage = multer({ storage: multer.memoryStorage(), ...imageUploadOptions })
 
 // Public routes
 router.get("/", getProjects)

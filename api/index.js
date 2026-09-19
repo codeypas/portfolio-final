@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import path from "path"
 import { fileURLToPath } from "url"
+import { findStoredImage, openStoredImageStream } from "./utils/mediaStorage.js"
 
 dotenv.config()
 
@@ -97,6 +98,26 @@ app.use("/uploads/study-icons", express.static(path.join(__dirname, "uploads/stu
 app.use("/uploads/study-files", express.static(path.join(__dirname, "uploads/study-files")))
 app.use("/uploads/projects", express.static(path.join(__dirname, "uploads/projects")))
 
+// Keep legacy disk uploads working when present, then serve all new uploads
+// from MongoDB GridFS so they survive Render restarts and redeploys.
+app.get("/uploads/:folder/:filename", async (req, res, next) => {
+  try {
+    const file = await findStoredImage(req.params.folder, req.params.filename)
+    if (!file) return next()
+
+    res.set({
+      "Content-Type": file.contentType || "application/octet-stream",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    })
+
+    const downloadStream = openStoredImageStream(file._id)
+    downloadStream.on("error", next)
+    downloadStream.pipe(res)
+  } catch (error) {
+    next(error)
+  }
+})
+
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server is running on port ${process.env.PORT || 3000}....!`)
 })
@@ -125,7 +146,7 @@ app.use("/api/projects", projectRoutes)
 app.use("/api/contact", contactRoutes)
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500
+  const statusCode = err.statusCode || (err.code === "LIMIT_FILE_SIZE" ? 413 : 500)
   const message = err.message || "Internal Server Error"
   res.status(statusCode).json({
     success: false,

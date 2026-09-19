@@ -8,27 +8,13 @@ import {
   incrementBlogView,
 } from "../controllers/blog.controller.js"
 import { verifyToken, verifyAdmin } from "../utils/verifyUser.js"
-import multer from "multer" // Import multer
-import path from "path" // Import path
-import { fileURLToPath } from "url" // For ES Modules
+import multer from "multer"
+import { imageUploadOptions } from "../utils/mediaStorage.js"
 
 const router = express.Router()
 
-// Get __dirname equivalent for ES Modules
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
-
-// Configure multer for blog thumbnail uploads
-const blogStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(__dirname, "../uploads/blogs")) // Store in api/uploads/blogs
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname) // Unique filename
-  },
-})
-
-const uploadBlogThumbnail = multer({ storage: blogStorage })
+// Image bytes are stored in MongoDB GridFS, not the temporary Render disk.
+const uploadBlogThumbnail = multer({ storage: multer.memoryStorage(), ...imageUploadOptions })
 
 // Public routes (anyone can view)
 router.get("/", getBlogs)

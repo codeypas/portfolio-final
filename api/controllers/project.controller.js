@@ -1,12 +1,12 @@
 import Project from "../models/project.model.js"
 import { errorHandler } from "../utils/error.js"
+import { deleteStoredImage, storeImage } from "../utils/mediaStorage.js"
 
 export const createProject = async (req, res, next) => {
   try {
     const projectData = req.body
-    // If a file was uploaded, set the image URL to the path where it's served
     if (req.file) {
-      projectData.image = `/uploads/projects/${req.file.filename}` // Corrected path for projects
+      projectData.image = await storeImage(req.file, "projects")
     } else if (!projectData.image) {
       // If no file uploaded and no URL provided, use default placeholder
       projectData.image = "/placeholder.svg?height=300&width=500&text=Project+Image"
@@ -35,7 +35,7 @@ export const createProject = async (req, res, next) => {
     const newProject = await Project.create(projectData)
     res.status(201).json(newProject)
   } catch (error) {
-    next(errorHandler(500, "Failed to create project"))
+    next(error)
   }
 }
 
@@ -71,9 +71,11 @@ export const getProject = async (req, res, next) => {
 export const updateProject = async (req, res, next) => {
   try {
     const projectData = req.body
-    // If a new file was uploaded, update the image URL
+    const existingProject = await Project.findById(req.params.id)
+    if (!existingProject) return next(errorHandler(404, "Project not found"))
+
     if (req.file) {
-      projectData.image = `/uploads/projects/${req.file.filename}` // Corrected path for projects
+      projectData.image = await storeImage(req.file, "projects")
     } else if (!projectData.image && req.body.image === "") {
       // If image is explicitly cleared and no new file, set to default
       projectData.image = "/placeholder.svg?height=300&width=500&text=Project+Image"
@@ -99,17 +101,21 @@ export const updateProject = async (req, res, next) => {
         .filter(Boolean)
     }
 
-    const updatedProject = await Project.findByIdAndUpdate(req.params.id, projectData, { new: true })
-    if (!updatedProject) return next(errorHandler(404, "Project not found"))
+    const updatedProject = await Project.findByIdAndUpdate(req.params.id, projectData, { new: true, runValidators: true })
+    if (req.file && existingProject.image !== updatedProject.image) {
+      await deleteStoredImage(existingProject.image)
+    }
     res.status(200).json(updatedProject)
   } catch (error) {
-    next(errorHandler(500, "Failed to update project"))
+    next(error)
   }
 }
 
 export const deleteProject = async (req, res, next) => {
   try {
-    await Project.findByIdAndDelete(req.params.id)
+    const deletedProject = await Project.findByIdAndDelete(req.params.id)
+    if (!deletedProject) return next(errorHandler(404, "Project not found"))
+    await deleteStoredImage(deletedProject.image)
     res.status(200).json("Project deleted successfully")
   } catch (error) {
     next(errorHandler(500, "Failed to delete project"))

@@ -1,11 +1,12 @@
 import Blog from "../models/blog.model.js"
 import { errorHandler } from "../utils/error.js"
+import { deleteStoredImage, storeImage } from "../utils/mediaStorage.js"
 
 export const createBlog = async (req, res, next) => {
   try {
     const blogData = req.body
     if (req.file) {
-      blogData.thumbnail = `/uploads/blogs/${req.file.filename}` // Path where it's served
+      blogData.thumbnail = await storeImage(req.file, "blogs")
     } else if (!blogData.thumbnail) {
       // If no file uploaded and no URL provided, use default placeholder
       blogData.thumbnail = "/placeholder.svg?height=200&width=300&text=Blog+Thumbnail"
@@ -22,7 +23,7 @@ export const createBlog = async (req, res, next) => {
     const newBlog = await Blog.create(blogData)
     res.status(201).json(newBlog)
   } catch (error) {
-    next(errorHandler(500, "Failed to create blog"))
+    next(error)
   }
 }
 
@@ -48,8 +49,11 @@ export const getBlog = async (req, res, next) => {
 export const updateBlog = async (req, res, next) => {
   try {
     const blogData = req.body
+    const existingBlog = await Blog.findById(req.params.id)
+    if (!existingBlog) return next(errorHandler(404, "Blog not found"))
+
     if (req.file) {
-      blogData.thumbnail = `/uploads/blogs/${req.file.filename}`
+      blogData.thumbnail = await storeImage(req.file, "blogs")
     } else if (!blogData.thumbnail && req.body.thumbnail === "") {
       // If thumbnail is explicitly cleared and no new file, set to default
       blogData.thumbnail = "/placeholder.svg?height=200&width=300&text=Blog+Thumbnail"
@@ -63,17 +67,21 @@ export const updateBlog = async (req, res, next) => {
         .filter(Boolean)
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blogData, { new: true })
-    if (!updatedBlog) return next(errorHandler(404, "Blog not found"))
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, blogData, { new: true, runValidators: true })
+    if (req.file && existingBlog.thumbnail !== updatedBlog.thumbnail) {
+      await deleteStoredImage(existingBlog.thumbnail)
+    }
     res.status(200).json(updatedBlog)
   } catch (error) {
-    next(errorHandler(500, "Failed to update blog"))
+    next(error)
   }
 }
 
 export const deleteBlog = async (req, res, next) => {
   try {
-    await Blog.findByIdAndDelete(req.params.id)
+    const deletedBlog = await Blog.findByIdAndDelete(req.params.id)
+    if (!deletedBlog) return next(errorHandler(404, "Blog not found"))
+    await deleteStoredImage(deletedBlog.thumbnail)
     res.status(200).json("Blog deleted successfully")
   } catch (error) {
     next(errorHandler(500, "Failed to delete blog"))
