@@ -12,6 +12,7 @@ import {
   ChevronUp,
 } from "lucide-react"
 import { GitHub, Linkedin } from "../component/BrandIcons"
+import { contactAPI } from "../services/api"
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -49,10 +50,10 @@ export default function Contact() {
     }
 
     setIsSubmitting(true)
+    setSubmitStatus(null)
 
     try {
-      // Simulate API call - replace with actual email service. 
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await contactAPI.sendMessage(formData)
 
       setSubmitStatus({
         type: "success",
@@ -107,9 +108,9 @@ export default function Contact() {
       {/* Header */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 to-purple-100 dark:from-gray-800 dark:to-gray-900">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Let's Connect 🤝</h1>
+          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">Let&apos;s Connect 🤝</h1>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Whether you have a question, project idea, internship opportunity, or just want to say hello — I'd love to
+            Whether you have a question, project idea, internship opportunity, or just want to say hello — I&apos;d love to
             hear from you. I usually reply within 24 hours.
           </p>
         </div>
@@ -218,7 +219,7 @@ export default function Contact() {
 
               <div className="space-y-4">
                 <a
-                  href="mailto:bjbestintheworld@gmail.com"
+                  href="mailto:bjbestintheworld17@gmail.com"
                   className="flex items-center p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow group"
                 >
                   <div className="p-3 bg-red-100 dark:bg-red-900/30 rounded-lg mr-4">
@@ -228,7 +229,7 @@ export default function Contact() {
                     <h4 className="font-semibold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                       Email
                     </h4>
-                    <p className="text-gray-600 dark:text-gray-300">bjbestintheworld@gmail.com</p>
+                    <p className="text-gray-600 dark:text-gray-300">bjbestintheworld17@gmail.com</p>
                   </div>
                 </a>
 

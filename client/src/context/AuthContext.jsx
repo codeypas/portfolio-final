@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { createContext, useContext, useState, useEffect } from "react"
 import { authAPI } from "../services/api"
 
@@ -51,10 +52,25 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null)
       const response = await authAPI.register(userData)
-      setUser(response.data.user)
+      if (response.data.user) {
+        setUser(response.data.user)
+      }
       return { success: true }
     } catch (error) {
       const message = error.response?.data?.message || "Registration failed. Please check if the server is running."
+      setError(message)
+      return { success: false, error: message }
+    }
+  }
+
+  const googleSignin = async (credential) => {
+    try {
+      setError(null)
+      const response = await authAPI.googleSignin(credential)
+      setUser(response.data.user)
+      return { success: true }
+    } catch (error) {
+      const message = error.response?.data?.message || "Google sign-in failed. Please try again."
       setError(message)
       return { success: false, error: message }
     }
@@ -80,6 +96,7 @@ export const AuthProvider = ({ children }) => {
     error,
     login,
     register,
+    googleSignin,
     logout,
     isAdmin,
   }

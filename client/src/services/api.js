@@ -33,6 +33,10 @@ api.interceptors.response.use(
 export const authAPI = {
   login: (credentials) => api.post("/auth/signin", credentials),
   register: (userData) => api.post("/auth/signup", userData),
+  googleSignin: (credential) => api.post("/auth/google", { credential }),
+  verifyEmail: (token) => api.get("/auth/verify-email", { params: { token } }),
+  requestPasswordReset: (email) => api.post("/auth/forgot-password", { email }),
+  resetPassword: (token, password) => api.post("/auth/reset-password", { token, password }),
   getProfile: (options = {}) =>
     api.get("/auth/profile", {
       meta: {

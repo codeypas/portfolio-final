@@ -1,5 +1,6 @@
 import Contact from "../models/contact.model.js"
 import { errorHandler } from "../utils/error.js"
+import { sendEmail } from "../utils/mailer.js"
 
 export const createContactMessage = async (req, res, next) => {
   try {
@@ -8,9 +9,15 @@ export const createContactMessage = async (req, res, next) => {
       return next(errorHandler(400, "Name, email, and message are required"))
     }
     const newContact = await Contact.create({ name, email, message })
+    await sendEmail({
+      to: process.env.CONTACT_RECIPIENT_EMAIL || "bjbestintheworld17@gmail.com",
+      replyTo: email,
+      subject: `Portfolio contact message from ${name}`,
+      text: `Name: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+    })
     res.status(201).json(newContact)
   } catch (error) {
-    next(errorHandler(500, "Failed to send contact message"))
+    next(error.statusCode ? error : errorHandler(500, "Failed to send contact message"))
   }
 }
 
